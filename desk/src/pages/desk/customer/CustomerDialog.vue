@@ -34,13 +34,19 @@
         <!-- Two-column form -->
         <form class="w-full" @submit.prevent="update">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <Input
-              v-for="field in fields"
-              :key="field.key"
-              v-model="field.model"
-              :label="field.label"
-              :placeholder="field.label"
-            />
+            <!-- Column 1 -->
+            <Input v-model="domain" label="Customer Name" placeholder="Customer Name" />
+            <Input v-model="domain" label="Address" placeholder="Address" />
+            <Input v-model="domain" label="VAT" placeholder="VAT" />
+            <Input v-model="domain" label="Registration Number" placeholder="Registration Number" />
+            <Input v-model="domain" label="Email" placeholder="Email" />
+
+            <!-- Column 2 -->
+            <Input v-model="domain" label="Phone Number" placeholder="Phone Number" />
+            <Input v-model="domain" label="Hosting Status" placeholder="Hosting Status" />
+            <Input v-model="domain" label="Engagement Date" placeholder="Engagement Date" />
+            <Input v-model="domain" label="Type of Client" placeholder="Type of Client" />
+            <Input v-model="domain" label="Domain" placeholder="example.com" />
           </div>
         </form>
       </div>
@@ -58,47 +64,94 @@ import {
 } from "frappe-ui";
 import { computed } from "vue";
 
-const props = defineProps({ name: String });
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+});
+
 const emit = defineEmits(["customer-updated"]);
 
 const customer = createDocumentResource({
   doctype: "HD Customer",
   name: props.name,
-  fields: [
-    "name", "image", "customer_name", "address", "vat", "registration_number",
-    "email", "phone_number", "hosting_status", "engagement_date",
-    "type_of_client", "domain",
+  fields:[
+    "name",
+    "image",
+    "customer_name",
+    "address",
+    "vat",
+    "registration_number",
+    "email",
+    "phone_number",
+    "hosting_status",
+    "engagement_date",
+    "type_of_client",
+    "domain",
   ],
   auto: true,
   setValue: {
-    onSuccess: () => toast.success("Customer updated"),
-    onError: () => toast.error("Error updating customer"),
+    onSuccess() {
+      toast.success("Customer updated");
+    },
+    onError() {
+      toast.error("Error updating customer");
+    },
   },
 });
 
-// Helper for computeds
-function createField(key: string) {
-  return computed({
-    get: () => customer.doc?.[key],
-    set: (v) => customer.setValue.submit({ [key]: v }),
-  });
-}
+//gettters and setters
+const customerName = computed({
+  get: () => customer.doc?.customer_name,
+  set: (v) => customer.setValue.submit({ customer_name: v }),
+});
 
-// forms fields
-const fields = [
-  { key: "customer_name", label: "Customer Name" },
-  { key: "address", label: "Address" },
-  { key: "vat", label: "VAT" },
-  { key: "registration_number", label: "Registration Number" },
-  { key: "email", label: "Email" },
-  { key: "phone_number", label: "Phone Number" },
-  { key: "hosting_status", label: "Hosting Status" },
-  { key: "engagement_date", label: "Engagement Date" },
-  { key: "type_of_client", label: "Type of Client" },
-  { key: "domain", label: "Domain" },
-].map(f => ({ ...f, model: createField(f.key) }));
+const address = computed({
+  get: () => customer.doc?.address,
+  set: (v) => customer.setValue.submit({ address: v }),
+});
 
-// dialog btns
+const vat = computed({
+  get: () => customer.doc?.vat,
+  set: (v) => customer.setValue.submit({ vat: v }),
+});
+
+const registrationNumber = computed({
+  get: () => customer.doc?.registration_number,
+  set: (v) => customer.setValue.submit({ registration_number: v }),
+});
+
+const email = computed({
+  get: () => customer.doc?.email,
+  set: (v) => customer.setValue.submit({ email: v }),
+});
+
+const phoneNumber = computed({
+  get: () => customer.doc?.phone_number,
+  set: (v) => customer.setValue.submit({ phone_number: v }),
+});
+
+const hostingStatus = computed({
+  get: () => customer.doc?.hosting_status,
+  set: (v) => customer.setValue.submit({ hosting_status: v }),
+});
+
+const engagementDate = computed({
+  get: () => customer.doc?.engagement_date,
+  set: (v) => customer.setValue.submit({ engagement_date: v }),
+});
+
+const typeOfClient = computed({
+  get: () => customer.doc?.type_of_client,
+  set: (v) => customer.setValue.submit({ type_of_client: v }),
+});
+
+const domain = computed({
+  get: () => customer.doc?.domain,
+  set: (v) => customer.setValue.submit({ domain: v }),
+});
+
 const options = computed(() => ({
   title: customer.doc?.name,
   actions: [
@@ -106,19 +159,28 @@ const options = computed(() => ({
       label: "Save",
       theme: "gray",
       variant: "solid",
-      onClick: update,
+      onClick: () => update(),
     },
   ],
 }));
 
-// save changes
 async function update() {
-  const data = Object.fromEntries(fields.map(f => [f.key, f.model.value]));
-  await customer.setValue.submit(data);
+  await customer.setValue.submit({
+    customer_name: customerName.value,
+    customer_address: address.value,
+    customer_vat: vat.value,
+    customer_reg_num: registrationNumber.value,
+    customer_email: email.value,
+    customer_phone: phoneNumber.value,
+    customer_hosting_status: hostingStatus.value,
+    customer_engagement_date: engagementDate.value,
+    customer_type_of_client: typeOfClient.value,
+    domain: domain.value,
+  });
   emit("customer-updated");
 }
 
-// update image
+/* image is still handled separately */
 function updateImage(file) {
   customer.setValue.submit({ image: file?.file_url || null });
   emit("customer-updated");
