@@ -292,6 +292,12 @@ function validatePhone(value: string) {
 function existingContactEmails(contacts) {
   return contacts.map((contact) => contact.email_id);
 }
+
+/* split the original list */
+const leftFields  = formFields.slice(0, 3); // Email, First Name, Last Name
+const rightFields = formFields.slice(3);      // Designation, Phone, Customer
+
 </script>
+
 
 <style></style>
