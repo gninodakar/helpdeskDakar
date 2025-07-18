@@ -179,12 +179,6 @@ To setup the repository locally follow the steps mentioned below:
 
 **Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
 
-## Learn and connect
-
-- [Telegram Public Group](https://t.me/frappedesk)
-- [Discuss Forum](https://discuss.frappe.io/c/frappehelpdesk/69)
-- [Documentation](https://docs.frappe.io/helpdesk)
-
 <br>
 <br>
 <div align="center">
