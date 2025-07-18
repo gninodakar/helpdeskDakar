@@ -46,7 +46,7 @@
             <Input v-model="hostingStatus" label="Hosting Status" placeholder="Hosting Status" />
             <Input v-model="engagementDate" label="Engagement Date" placeholder="Engagement Date" />
             <Input v-model="typeOfClient" label="Type of Client" placeholder="Type of Client" />
-            <Input v-model="domain" label="Domain" placeholder="example.com" />
+            <Input v-model="domain" label="Domain" placeholder="example.com" />                                                                        
           </div>
         </form>
       </div>

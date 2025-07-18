@@ -1,21 +1,18 @@
 <template>
-  <div>
-    <Dialog v-model="open" :options="{ title: 'Create New Contact' }">
-      <template #body-content>
-        <div class="space-y-4">
+  <Dialog v-model="open" :options="{ title: 'Create New Contact' }">
+    <template #body-content>
+      <div class="space-y-4">
+        <!-- two columns -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <!-- left column -->
           <div
-            v-for="field in formFields"
+            v-for="field in leftFields"
             :key="field.label"
             class="flex flex-col gap-1"
           >
             <span class="mb-2 block text-sm leading-4 text-gray-700">
               {{ field.label }}
-              <span
-                v-if="field.required"
-                class="place-self-center text-red-500"
-              >
-                *
-              </span>
+              <span v-if="field.required" class="text-red-500">*</span>
             </span>
             <Input
               v-if="field.type === 'input'"
@@ -31,20 +28,49 @@
             />
             <ErrorMessage :message="error[field.error]" />
           </div>
-          <div class="flex justify-end space-x-2">
-            <Button
-              label="Create"
-              :loading="contactResource.loading"
-              theme="gray"
-              variant="solid"
-              @click="createContact()"
+
+          <!-- right column -->
+          <div
+            v-for="field in rightFields"
+            :key="field.label"
+            class="flex flex-col gap-1"
+          >
+            <span class="mb-2 block text-sm leading-4 text-gray-700">
+              {{ field.label }}
+              <span v-if="field.required" class="text-red-500">*</span>
+            </span>
+            <Input
+              v-if="field.type === 'input'"
+              v-model="state[field.value]"
+              type="text"
+              @blur="field.action"
             />
+            <Autocomplete
+              v-else
+              v-model="state[field.value]"
+              :options="customerResource.data"
+              @update:model-value="handleCustomerChange"
+            />
+            <ErrorMessage :message="error[field.error]" />
           </div>
         </div>
-      </template>
-    </Dialog>
-  </div>
+
+        <!-- action buttons -->
+        <div class="flex justify-end space-x-2">
+          <Button
+            label="Create"
+            :loading="contactResource.loading"
+            theme="gray"
+            variant="solid"
+            @click="createContact()"
+          />
+        </div>
+      </div>
+    </template>
+  </Dialog>
 </template>
+
+
 
 <script setup lang="ts">
 import { useContactStore } from "@/stores/contact";
@@ -82,14 +108,16 @@ const state = ref({
   lastName: "",
   phone: "",
   selectedCustomer: null,
+  designation: "",
 });
 
 const error = ref({
   emailValidationError: "",
   firstNameValidationError: "",
-  lastNameValidationError: "",
+  lastNameValidationError: "",  
   phoneValidationError: "",
   customerValidationError: "",
+  designationValidationError: "",
 });
 
 interface FormField {
@@ -122,6 +150,13 @@ const formFields: FormField[] = [
     label: "Last Name",
     value: "lastName",
     error: "lastNameValidationError",
+    type: "input",
+    required: false,
+  },
+  {
+    label: "Designation",
+    value: "designation",
+    error: "designationValidationError",
     type: "input",
     required: false,
   },
@@ -174,8 +209,9 @@ const contactResource = createResource({
       emailID: "",
       firstName: "",
       lastName: "",
-      phone: "",
+      phone: "",      
       selectedCustomer: null,
+      designation: "",
     };
     toast.success("Contact created");
     emit("contactCreated");
@@ -192,6 +228,7 @@ function createContact() {
     email_ids: [{ email_id: state.value.emailID, is_primary: true }],
     links: [],
     phone_nos: [],
+    designation: state.value.designation,
   };
   if (state.value.phone) {
     doc.phone_nos = [{ phone: state.value.phone }];
