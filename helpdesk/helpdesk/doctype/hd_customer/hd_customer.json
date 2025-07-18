@@ -35,13 +35,6 @@
    "unique": 1
   },
   {
-   "fieldname": "domain",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Domain"
-  },
-  {
    "fieldname": "references_tab",
    "fieldtype": "Tab Break",
    "label": "References"
@@ -94,12 +87,19 @@
   {
    "fieldname": "column_break_avai",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "domain",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Domain"
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-17 15:51:03.591775",
+ "modified": "2025-07-18 13:27:19.048441",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",

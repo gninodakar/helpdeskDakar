@@ -78,6 +78,15 @@ export default defineConfig({
       "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
     },
   },
+
+  server: {
+    host: "0.0.0.0", 
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      host: "localhost", 
+    },
+  },
   optimizeDeps: {
     include: [
       "feather-icons",

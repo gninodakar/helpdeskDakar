@@ -35,17 +35,17 @@
         <form class="w-full" @submit.prevent="update">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <!-- Column 1 -->
-            <Input v-model="domain" label="Customer Name" placeholder="Customer Name" />
-            <Input v-model="domain" label="Address" placeholder="Address" />
-            <Input v-model="domain" label="VAT" placeholder="VAT" />
-            <Input v-model="domain" label="Registration Number" placeholder="Registration Number" />
-            <Input v-model="domain" label="Email" placeholder="Email" />
+            <Input v-model="customerName" label="Customer Name" placeholder="Customer Name" />
+            <Input v-model="address" label="Address" placeholder="Address" />
+            <Input v-model="vat" label="VAT" placeholder="VAT" />
+            <Input v-model="registrationNumber" label="Registration Number" placeholder="Registration Number" />
+            <Input v-model="email" label="Email" placeholder="Email" />
 
             <!-- Column 2 -->
-            <Input v-model="domain" label="Phone Number" placeholder="Phone Number" />
-            <Input v-model="domain" label="Hosting Status" placeholder="Hosting Status" />
-            <Input v-model="domain" label="Engagement Date" placeholder="Engagement Date" />
-            <Input v-model="domain" label="Type of Client" placeholder="Type of Client" />
+            <Input v-model="phoneNumber" label="Phone Number" placeholder="Phone Number" />
+            <Input v-model="hostingStatus" label="Hosting Status" placeholder="Hosting Status" />
+            <Input v-model="engagementDate" label="Engagement Date" placeholder="Engagement Date" />
+            <Input v-model="typeOfClient" label="Type of Client" placeholder="Type of Client" />
             <Input v-model="domain" label="Domain" placeholder="example.com" />
           </div>
         </form>
@@ -80,14 +80,14 @@ const customer = createDocumentResource({
     "name",
     "image",
     "customer_name",
-    "address",
-    "vat",
-    "registration_number",
-    "email",
-    "phone_number",
-    "hosting_status",
-    "engagement_date",
-    "type_of_client",
+    "customer_address",
+    "customer_vat",
+    "customer_reg_num",
+    "customer_email",
+    "customer_phone",
+    "customer_hosting_status",
+    "customer_engagement_date",
+    "customer_type_of_client",
     "domain",
   ],
   auto: true,
@@ -100,7 +100,6 @@ const customer = createDocumentResource({
     },
   },
 });
-
 //gettters and setters
 const customerName = computed({
   get: () => customer.doc?.customer_name,
@@ -108,43 +107,43 @@ const customerName = computed({
 });
 
 const address = computed({
-  get: () => customer.doc?.address,
-  set: (v) => customer.setValue.submit({ address: v }),
+  get: () => customer.doc?.customer_address,
+  set: (v) => customer.setValue.submit({ customer_address: v }),
 });
 
 const vat = computed({
-  get: () => customer.doc?.vat,
-  set: (v) => customer.setValue.submit({ vat: v }),
+  get: () => customer.doc?.customer_vat,
+  set: (v) => customer.setValue.submit({ customer_vat: v }),
 });
 
 const registrationNumber = computed({
-  get: () => customer.doc?.registration_number,
-  set: (v) => customer.setValue.submit({ registration_number: v }),
+  get: () => customer.doc?.customer_reg_num,
+  set: (v) => customer.setValue.submit({ customer_reg_num: v }),
 });
 
 const email = computed({
-  get: () => customer.doc?.email,
-  set: (v) => customer.setValue.submit({ email: v }),
+  get: () => customer.doc?.customer_email,
+  set: (v) => customer.setValue.submit({ customer_email: v }),
 });
 
 const phoneNumber = computed({
-  get: () => customer.doc?.phone_number,
-  set: (v) => customer.setValue.submit({ phone_number: v }),
+  get: () => customer.doc?.customer_phone,
+  set: (v) => customer.setValue.submit({ customer_phone: v }),
 });
 
 const hostingStatus = computed({
-  get: () => customer.doc?.hosting_status,
-  set: (v) => customer.setValue.submit({ hosting_status: v }),
+  get: () => customer.doc?.customer_hosting_status,
+  set: (v) => customer.setValue.submit({ customer_hosting_status: v }),
 });
 
 const engagementDate = computed({
-  get: () => customer.doc?.engagement_date,
-  set: (v) => customer.setValue.submit({ engagement_date: v }),
+  get: () => customer.doc?.customer_engagement_date,
+  set: (v) => customer.setValue.submit({ customer_engagement_date: v }),
 });
 
 const typeOfClient = computed({
-  get: () => customer.doc?.type_of_client,
-  set: (v) => customer.setValue.submit({ type_of_client: v }),
+  get: () => customer.doc?.customer_type_of_client,
+  set: (v) => customer.setValue.submit({ customer_type_of_client: v }),
 });
 
 const domain = computed({
@@ -164,6 +163,8 @@ const options = computed(() => ({
   ],
 }));
 
+
+//this function update the fields in frappe
 async function update() {
   await customer.setValue.submit({
     customer_name: customerName.value,
