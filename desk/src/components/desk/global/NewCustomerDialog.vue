@@ -50,11 +50,18 @@
                 type="text"
                 placeholder="Hosting Status"
               />
-              <Input
+              <!-- <Input
                 v-model="state.engagement_date"
                 label="Engagement Date"
                 type="text"
                 placeholder="Engagement Date"
+              /> -->
+               <DatePicker
+                v-model="state.engagement_date"
+                label="Engagement Date"
+                variant="subtle"
+                placeholder="Engagement Date"
+                :disabled="false"
               />
               <Input
                 v-model="state.type_of_client"
@@ -88,6 +95,8 @@
 <script setup lang="ts">
 import { Dialog, Input, createResource, toast } from "frappe-ui";
 import { reactive } from "vue";
+import { DatePicker } from "frappe-ui";
+
 // import { custom } from "zod"; // 'custom' is not used here, consider removing if not needed
 
 const emit = defineEmits(["customerCreated"]);
@@ -101,7 +110,7 @@ const state = reactive({
   email: "",
   phone: "",
   hosting_status: "",
-  engagement_date: "",
+  engagement_date: "" as string,
   type_of_client: "",
   domain: "",
 });
@@ -133,7 +142,7 @@ const customerResource = createResource({
     state.email = "";
     state.phone = "";
     state.hosting_status = "";
-    state.engagement_date = "";
+    state.engagement_date = null;
     state.type_of_client = "";
     state.domain = "";
     toast.success("Customer created");
@@ -154,14 +163,14 @@ function addCustomer() {
       doctype: "HD Customer",
       customer_name: state.customer,
       customer_address: state.address,
-      customer_vat: state.vat, // Asegúrate de que estos nombres de campo estén correctos para tu DocType
+      customer_vat: state.vat, 
       customer_reg_num: state.reg_num,
       customer_email: state.email,
       customer_phone: state.phone,
       customer_hosting_status: state.hosting_status,
-      customer_engagement_date: state.engagement_date,
+      customer_engagement_date: state.engagement_date || null,
       customer_type_of_client: state.type_of_client,
-      customer_domain: state.domain,
+      domain: state.domain,
     },
   });
 }

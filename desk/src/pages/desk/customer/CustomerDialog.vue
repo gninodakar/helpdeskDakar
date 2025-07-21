@@ -44,7 +44,8 @@
             <!-- Column 2 -->
             <Input v-model="phoneNumber" label="Phone Number" placeholder="Phone Number" />
             <Input v-model="hostingStatus" label="Hosting Status" placeholder="Hosting Status" />
-            <Input v-model="engagementDate" label="Engagement Date" placeholder="Engagement Date" />
+            <DatePicker v-model="engagementDate" label="Engagement Date" variant="subtle" placeholder="Engagement Date" :disabled="false"/>
+            <!-- <Input v-model="engagementDate" label="Engagement Date" placeholder="Engagement Date" /> -->
             <Input v-model="typeOfClient" label="Type of Client" placeholder="Type of Client" />
             <Input v-model="domain" label="Domain" placeholder="example.com" />                                                                        
           </div>
@@ -61,6 +62,7 @@ import {
   Dialog,
   FileUploader,
   toast,
+   DatePicker,
 } from "frappe-ui";
 import { computed } from "vue";
 
@@ -174,7 +176,7 @@ async function update() {
     customer_email: email.value,
     customer_phone: phoneNumber.value,
     customer_hosting_status: hostingStatus.value,
-    customer_engagement_date: engagementDate.value,
+    customer_engagement_date: engagementDate.value || null,
     customer_type_of_client: typeOfClient.value,
     domain: domain.value,
   });
