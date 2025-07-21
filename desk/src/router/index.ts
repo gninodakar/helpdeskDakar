@@ -27,6 +27,12 @@ const routes = [
     redirect: "/tickets",
   },
 
+   {
+    path: "/tickets",
+    name: "TicketsAgentBoxes",
+    component: () => import("@/pages/ticket/TicketsBoxes.vue"),
+  },
+
   {
     path: "/tickets",
     name: "TicketsAgent",

@@ -18,14 +18,16 @@
               v-if="field.type === 'input'"
               v-model="state[field.value]"
               type="text"
+              :placeholder="field.placeholder"
               @blur="field.action"
             />
-            <Autocomplete
+            <!-- <Autocomplete
               v-else
               v-model="state[field.value]"
               :options="customerResource.data"
+              :placeholder="field.placeholder"
               @update:model-value="handleCustomerChange"
-            />
+            /> -->
             <ErrorMessage :message="error[field.error]" />
           </div>
 
@@ -42,6 +44,7 @@
             <Input
               v-if="field.type === 'input'"
               v-model="state[field.value]"
+              :placeholder="field.placeholder"
               type="text"
               @blur="field.action"
             />
@@ -49,6 +52,7 @@
               v-else
               v-model="state[field.value]"
               :options="customerResource.data"
+              :placeholder="field.placeholder"
               @update:model-value="handleCustomerChange"
             />
             <ErrorMessage :message="error[field.error]" />
@@ -127,6 +131,7 @@ interface FormField {
   type: string;
   required: boolean;
   action?: () => void;
+  placeholder?: string;
 }
 
 const formFields: FormField[] = [
@@ -135,6 +140,9 @@ const formFields: FormField[] = [
     value: "emailID",
     error: "emailValidationError",
     type: "input",
+    placeholder: "Enter your email",
+    
+    
     required: true,
     action: () => validateEmailInput(state.value.emailID),
   },
@@ -145,6 +153,7 @@ const formFields: FormField[] = [
     type: "input",
     required: true,
     action: () => validateFirstName(state.value.firstName),
+    placeholder: "First Name",
   },
   {
     label: "Last Name",
@@ -152,6 +161,7 @@ const formFields: FormField[] = [
     error: "lastNameValidationError",
     type: "input",
     required: false,
+    placeholder: "Last Name",
   },
   {
     label: "Designation",
@@ -159,6 +169,7 @@ const formFields: FormField[] = [
     error: "designationValidationError",
     type: "input",
     required: false,
+    placeholder: "Designation",
   },
   {
     label: "Phone",
@@ -167,6 +178,7 @@ const formFields: FormField[] = [
     type: "input",
     required: false,
     action: () => validatePhone(state.value.phone),
+    placeholder: "Phone Number",
   },
   {
     label: "Customer",
@@ -174,6 +186,7 @@ const formFields: FormField[] = [
     error: "customerValidationError",
     type: "autocomplete",
     required: false,
+    placeholder: "Customer",
   },
 ];
 
@@ -210,7 +223,7 @@ const contactResource = createResource({
       firstName: "",
       lastName: "",
       phone: "",      
-      selectedCustomer: null,
+      selectedCustomer: "",
       designation: "",
     };
     toast.success("Contact created");
@@ -283,7 +296,7 @@ function validateFirstName(value: string) {
 function validatePhone(value: string) {
   error.value.phoneValidationError = "";
   const reg = /[0-9]+/;
-  if (value && (!reg.test(value) || value.length < 10)) {
+  if (value && (!reg.test(value) || value.length < 8 )) {
     error.value.phoneValidationError = "Enter a valid phone number";
   }
   return error.value.phoneValidationError;
