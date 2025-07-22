@@ -7,7 +7,7 @@
     }"
   >
     <UserMenu class="mb-2" :options="profileSettings" />
-    <SidebarLink
+    <!-- <SidebarLink
       v-if="!isCustomerPortal"
       label="Search"
       class="my-0.5"
@@ -21,7 +21,7 @@
           <span>K</span>
         </span>
       </template>
-    </SidebarLink>
+    </SidebarLink> -->
     <SidebarLink
       v-if="!isCustomerPortal"
       class="relative my-0.5 min-h-7"

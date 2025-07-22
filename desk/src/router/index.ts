@@ -24,13 +24,13 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    redirect: "/tickets",
+    redirect: "/ticketsnewview",
   },
 
    {
-    path: "/tickets",
-    name: "TicketsAgentBoxes",
-    component: () => import("@/pages/ticket/TicketsBoxes.vue"),
+    path: "/ticketsnewview",
+    name: "TicketNewView",
+    component: () => import("@/pages/ticket/TicketsNewView.vue"),
   },
 
   {

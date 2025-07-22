@@ -6,12 +6,12 @@ import { OrganizationsIcon } from "../icons";
 
 export const agentPortalSidebarOptions = [
   {
-    label: "Tickets New View",
+    label: "Tickets Summary",
     icon: LucideTicket,
-    to: "TicketsAgentBoxes",
+    to: "TicketNewView",
   },
   {
-    label: "Tickets",
+    label: "Tickets List",
     icon: LucideTicket,
     to: "TicketsAgent",
   },
