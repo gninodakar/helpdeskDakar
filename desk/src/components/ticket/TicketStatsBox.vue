@@ -8,6 +8,14 @@
             {{ email }}
           </a>
         </p>
+        <!-- button -->
+        <a
+        href="https://example.com/view"
+        target="_blank"
+        class="inline-block mt-2 text-sm px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+        View Details
+        </a>
       </div>
       <div class="text-right">
         <p class="text-sm text-gray-500">Tickets Closed</p>
@@ -36,6 +44,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 defineProps<{
