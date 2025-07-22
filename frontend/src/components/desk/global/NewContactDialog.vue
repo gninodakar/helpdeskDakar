@@ -204,15 +204,15 @@ const customerResource = createListResource({
   doctype: "HD Customer",
   fields: ["name"],
   cache: "customers",
-  transform: (data) => {
-    return data.map((option) => {
-      return {
-        label: option.name,
-        value: option.name,
-      };
-    });
-  },
   auto: true,
+  searchField: "name", 
+  transform: (data) =>
+    Array.isArray(data)
+      ? data.map((option) => ({
+          label: option.name,  
+          value: option.name,  
+        }))
+      : [],
 });
 
 const contactResource = createResource({

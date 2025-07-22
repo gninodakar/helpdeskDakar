@@ -2,9 +2,9 @@
   <Dialog v-model="open" :options="{ title: 'Create New Contact' }">
     <template #body-content>
       <div class="space-y-4">
-        <!-- two columns -->
+        <!-- Two Columns -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-          <!-- left column -->
+          <!-- Left Column -->
           <div
             v-for="field in leftFields"
             :key="field.label"
@@ -14,24 +14,20 @@
               {{ field.label }}
               <span v-if="field.required" class="text-red-500">*</span>
             </span>
-            <Input
-              v-if="field.type === 'input'"
+
+            <!-- Dynamic Field Component -->
+            <component
+              :is="getComponent(field.type)"
               v-model="state[field.value]"
-              type="text"
-              :placeholder="field.placeholder"
-              @blur="field.action"
+              v-bind="getComponentProps(field.type, field.value, field.placeholder)"
+              @update:model-value="field.type === 'autocomplete' ? handleCustomerChange : null"
+              @blur="field.action && field.action()"
             />
-            <!-- <Autocomplete
-              v-else
-              v-model="state[field.value]"
-              :options="customerResource.data"
-              :placeholder="field.placeholder"
-              @update:model-value="handleCustomerChange"
-            /> -->
+
             <ErrorMessage :message="error[field.error]" />
           </div>
 
-          <!-- right column -->
+          <!-- Right Column -->
           <div
             v-for="field in rightFields"
             :key="field.label"
@@ -41,25 +37,21 @@
               {{ field.label }}
               <span v-if="field.required" class="text-red-500">*</span>
             </span>
-            <Input
-              v-if="field.type === 'input'"
+
+            <!-- Dynamic Field Component -->
+            <component
+              :is="getComponent(field.type)"
               v-model="state[field.value]"
-              :placeholder="field.placeholder"
-              type="text"
-              @blur="field.action"
+              v-bind="getComponentProps(field.type, field.value, field.placeholder)"
+              @update:model-value="field.type === 'autocomplete' ? handleCustomerChange : null"
+              @blur="field.action && field.action()"
             />
-            <Autocomplete
-              v-else
-              v-model="state[field.value]"
-              :options="customerResource.data"
-              :placeholder="field.placeholder"
-              @update:model-value="handleCustomerChange"
-            />
+
             <ErrorMessage :message="error[field.error]" />
           </div>
         </div>
 
-        <!-- action buttons -->
+        <!-- Action Buttons -->
         <div class="flex justify-end space-x-2">
           <Button
             label="Create"
@@ -77,9 +69,7 @@
 
 
 <script setup lang="ts">
-import { useContactStore } from "@/stores/contact";
 import { computed, ref } from "vue";
-
 import {
   Autocomplete,
   Dialog,
@@ -90,8 +80,8 @@ import {
   toast,
 } from "frappe-ui";
 import zod from "zod";
-
 import { AutoCompleteItem } from "@/types";
+import { useContactStore } from "@/stores/contact";
 
 interface Props {
   modelValue: boolean;
@@ -111,92 +101,24 @@ const state = ref({
   firstName: "",
   lastName: "",
   phone: "",
-  selectedCustomer: null,
+  selectedCustomer: "",
   designation: "",
 });
 
 const error = ref({
   emailValidationError: "",
   firstNameValidationError: "",
-  lastNameValidationError: "",  
+  lastNameValidationError: "",
   phoneValidationError: "",
   customerValidationError: "",
   designationValidationError: "",
 });
 
-interface FormField {
-  label: string;
-  value: string;
-  error: string;
-  type: string;
-  required: boolean;
-  action?: () => void;
-  placeholder?: string;
-}
-
-const formFields: FormField[] = [
-  {
-    label: "Email Id",
-    value: "emailID",
-    error: "emailValidationError",
-    type: "input",
-    placeholder: "Enter your email",
-    
-    
-    required: true,
-    action: () => validateEmailInput(state.value.emailID),
-  },
-  {
-    label: "First Name",
-    value: "firstName",
-    error: "firstNameValidationError",
-    type: "input",
-    required: true,
-    action: () => validateFirstName(state.value.firstName),
-    placeholder: "First Name",
-  },
-  {
-    label: "Last Name",
-    value: "lastName",
-    error: "lastNameValidationError",
-    type: "input",
-    required: false,
-    placeholder: "Last Name",
-  },
-  {
-    label: "Designation",
-    value: "designation",
-    error: "designationValidationError",
-    type: "input",
-    required: false,
-    placeholder: "Designation",
-  },
-  {
-    label: "Phone",
-    value: "phone",
-    error: "phoneValidationError",
-    type: "input",
-    required: false,
-    action: () => validatePhone(state.value.phone),
-    placeholder: "Phone Number",
-  },
-  {
-    label: "Customer",
-    value: "selectedCustomer",
-    error: "customerValidationError",
-    type: "autocomplete",
-    required: false,
-    placeholder: "Customer",
-  },
-];
-
 const open = computed({
   get: () => props.modelValue,
   set: (val) => {
     emit("update:modelValue", val);
-    if (!val) {
-      emit("close");
-    }
+    if (!val) emit("close");
   },
 });
 
@@ -204,28 +126,22 @@ const customerResource = createListResource({
   doctype: "HD Customer",
   fields: ["name"],
   cache: "customers",
-  transform: (data) => {
-    return data.map((option) => {
-      return {
-        label: option.name,
-        value: option.name,
-      };
-    });
-  },
   auto: true,
+  searchField: "name", 
+  transform: (data) =>
+    Array.isArray(data)
+      ? data.map((option) => ({
+          label: option.name,  
+          value: option.name,  
+        }))
+      : [],
 });
+
 
 const contactResource = createResource({
   url: "frappe.client.insert",
   onSuccess: () => {
-    state.value = {
-      emailID: "",
-      firstName: "",
-      lastName: "",
-      phone: "",      
-      selectedCustomer: "",
-      designation: "",
-    };
+    resetForm();
     toast.success("Contact created");
     emit("contactCreated");
   },
@@ -234,7 +150,7 @@ const contactResource = createResource({
 function createContact() {
   if (validateInputs()) return;
 
-  let doc = {
+  const doc: any = {
     doctype: "Contact",
     first_name: state.value.firstName,
     last_name: state.value.lastName,
@@ -242,9 +158,11 @@ function createContact() {
     links: [],
     phone_nos: [],
     designation: state.value.designation,
+    company_name: state.value.selectedCustomer,
   };
+
   if (state.value.phone) {
-    doc.phone_nos = [{ phone: state.value.phone }];
+    doc.phone_nos.push({ phone: state.value.phone });
   }
   if (state.value.selectedCustomer) {
     doc.links.push({
@@ -257,18 +175,15 @@ function createContact() {
 }
 
 function handleCustomerChange(item: AutoCompleteItem | null) {
-  if (!item || item.label === "No label") {
-    state.value.selectedCustomer = null;
-  } else {
-    state.value.selectedCustomer = item.value;
-  }
+  state.value.selectedCustomer = item?.value || "";
 }
 
 function validateInputs() {
-  let error = validateEmailInput(state.value.emailID);
-  error += validateFirstName(state.value.firstName);
-  error += validatePhone(state.value.phone);
-  return error;
+  return [
+    validateEmailInput(state.value.emailID),
+    validateFirstName(state.value.firstName),
+    validatePhone(state.value.phone),
+  ].some(Boolean);
 }
 
 function validateEmailInput(value: string) {
@@ -287,7 +202,7 @@ function validateEmailInput(value: string) {
 
 function validateFirstName(value: string) {
   error.value.firstNameValidationError = "";
-  if (!value || value.trim() === "") {
+  if (!value?.trim()) {
     error.value.firstNameValidationError = "First name should not be empty";
   }
   return error.value.firstNameValidationError;
@@ -296,21 +211,61 @@ function validateFirstName(value: string) {
 function validatePhone(value: string) {
   error.value.phoneValidationError = "";
   const reg = /[0-9]+/;
-  if (value && (!reg.test(value) || value.length < 8 )) {
+  if (value && (!reg.test(value) || value.length < 8)) {
     error.value.phoneValidationError = "Enter a valid phone number";
   }
   return error.value.phoneValidationError;
 }
 
 function existingContactEmails(contacts) {
-  return contacts.map((contact) => contact.email_id);
+  return contacts.map((c) => c.email_id);
 }
 
-/* split the original list */
-const leftFields  = formFields.slice(0, 3); // Email, First Name, Last Name
-const rightFields = formFields.slice(3);      // Designation, Phone, Customer
+function resetForm() {
+  state.value = {
+    emailID: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    selectedCustomer: "",
+    designation: "",
+  };
+}
 
+// Field config
+const formFields = [
+  { label: "Email Id", value: "emailID", error: "emailValidationError", type: "input", required: true, placeholder: "Enter your email", action: () => validateEmailInput(state.value.emailID) },
+  { label: "First Name", value: "firstName", error: "firstNameValidationError", type: "input", required: true, placeholder: "First Name", action: () => validateFirstName(state.value.firstName) },
+  { label: "Last Name", value: "lastName", error: "lastNameValidationError", type: "input", required: false, placeholder: "Last Name" },
+  { label: "Designation", value: "designation", error: "designationValidationError", type: "input", required: false, placeholder: "Designation" },
+  { label: "Phone", value: "phone", error: "phoneValidationError", type: "input", required: false, placeholder: "Phone Number", action: () => validatePhone(state.value.phone) },
+  { label: "Customer", value: "selectedCustomer", error: "customerValidationError", type: "autocomplete", required: false, placeholder: "Customer" },
+];
+
+
+const mid = Math.ceil(formFields.length / 2);
+const leftFields = formFields.slice(0, mid);
+const rightFields = formFields.slice(mid);
+
+// Dynamic component mapping
+function getComponent(type: string) {
+  if (type === "autocomplete") return Autocomplete;
+  return Input;
+}
+
+function getComponentProps(type: string, value: string, placeholder?: string) {
+  if (type === "autocomplete") {
+    return {
+      placeholder,
+      options: customerResource.data || [],
+    };
+  }
+  return {
+    name: value,
+    placeholder,
+    type: "text",
+  };
+}
 </script>
-
 
 <style></style>
