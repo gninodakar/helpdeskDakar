@@ -175,6 +175,7 @@ function createContact() {
 }
 
 function handleCustomerChange(item: AutoCompleteItem | null) {
+  console.log("Selected customer item:", item);
   state.value.selectedCustomer = item?.value || "";
 }
 
