@@ -46,10 +46,18 @@
             />
           </div>
           <div class="space-y-1">
+            <div class="text-xs">Designation</div>
+            <MultiSelect
+              v-model:items="designation"
+              placeholder="Designation"
+              :validate="validateEmail"
+            />
+          </div>
+          <div class="space-y-1">
             <div class="text-xs">Phone Nos</div>
             <MultiSelect
               v-model:items="phones"
-              placeholder="+91 98765 43210"
+              placeholder="795xxxxx"
               :validate="validatePhone"
             />
           </div>
@@ -274,7 +282,7 @@ function validatePhone(input: AutoCompleteItem): string | void {
   const success = zod
     .string()
     .regex(/^\+[1-9]\d{1,14}$/)
-    .min(10)
+    .min(8)
     .max(15)
     .safeParse(input.value).success;
   if (!success) return "Invalid phone number";
