@@ -1,10 +1,10 @@
 <template>
   <div>
-    <LayoutHeader>
-      <template #left-header>
-        <ViewBreadcrumbs label="Tickets Summary" />
-      </template>
-    </LayoutHeader>
+  <LayoutHeader>
+    <template #left-header>
+      <h1 class="text-lg font-semibold text-ink-gray-8">Tickets Summary</h1>
+    </template>
+  </LayoutHeader>
 
     <!-- Stats Boxes -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-4">
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import TicketStatsBox from "@/components/ticket/TicketStatsBox.vue";
 import { LayoutHeader } from "@/components";
-import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
+// import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import { usePageMeta } from "frappe-ui";
 
 usePageMeta(() => ({
