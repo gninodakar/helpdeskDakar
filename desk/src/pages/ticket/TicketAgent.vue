@@ -53,12 +53,12 @@
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col max-w-[calc(100%-382px)]">
-        <!-- ticket activities -->
         <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
           <Tabs v-model="tabIndex" :tabs="tabs">
             <TabList />
             <TabPanel v-slot="{ tab }" class="h-full">
               <TicketAgentActivities
+                v-if="tab.name !== 'time-sheet'"
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
@@ -74,7 +74,10 @@
                   }
                 "
               />
-            </TabPanel>
+              <div v-else-if="tab.name === 'time-sheet'" class="p-4 h-full overflow-y-auto">
+                <TimeSheetForm :ticket-id="ticket.data.name" @row-added="ticket.reload()" />
+              </div>
+              </TabPanel>
           </Tabs>
         </div>
         <CommunicationArea
@@ -111,7 +114,6 @@
         }
       "
     />
-    <!-- Rename Subject Dialog -->
     <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
       <template #body-content>
         <div class="flex flex-col flex-1 gap-3">
@@ -164,6 +166,7 @@ import {
   IndicatorIcon,
 } from "@/components/icons";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
+import TimeSheetForm from "@/components/ticket/TimeSheetForm.vue"; 
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { useView } from "@/composables/useView";
 import { socket } from "@/socket";
@@ -303,6 +306,11 @@ const tabs: TabObject[] = [
   {
     name: "comment",
     label: "Comments",
+    icon: CommentIcon,
+  },
+  {
+    name: "time-sheet",
+    label: "Time Sheet",
     icon: CommentIcon,
   },
 ];
