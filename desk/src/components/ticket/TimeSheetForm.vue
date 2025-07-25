@@ -143,6 +143,9 @@ const form = reactive({
   description: '',
 });
 
+
+
+//events list for dropdown
 const eventTypes = ref([
   { label: 'Development', value: 'Development' },
   { label: 'Meeting', value: 'Meeting' },
@@ -150,7 +153,7 @@ const eventTypes = ref([
   { label: 'Documentation', value: 'Documentation' },
   { label: 'Testing', value: 'Testing' },
   { label: 'Support', value: 'Support' },
-  { label: 'Other', value: 'Other' }, // Added an 'Other' option
+  { label: 'Other', value: 'Other' }, 
 ]);
 
 const isLoading = ref(false);
