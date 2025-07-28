@@ -1,25 +1,35 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "field:hd_event_ts_name",
  "creation": "2025-07-25 12:55:45.602573",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_bomb"
+  "hd_event_ts_name",
+  "hd_event_description"
  ],
  "fields": [
   {
-   "fieldname": "section_break_bomb",
-   "fieldtype": "Section Break"
+   "fieldname": "hd_event_description",
+   "fieldtype": "Data",
+   "label": "Description"
+  },
+  {
+   "fieldname": "hd_event_ts_name",
+   "fieldtype": "Data",
+   "label": "Event Type",
+   "unique": 1
   }
  ],
  "grid_page_length": 50,
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-25 12:55:45.602573",
+ "modified": "2025-07-25 15:27:05.160718",
  "modified_by": "Administrator",
  "module": "Helpdesk",
- "name": "HD Event Type",
+ "name": "HD Events Type",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

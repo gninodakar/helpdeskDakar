@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestHDEventType(FrappeTestCase):
+class TestHDTimeSheetEvents(FrappeTestCase):
 	pass

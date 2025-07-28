@@ -7,13 +7,12 @@
         <label for="eventType" class="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
         <select
           id="eventType"
-          v-model="form.eventType"
-          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          v-model="form.hd_event_ts_name" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           required
         >
           <option value="">Select event</option>
           <option v-for="event in eventTypes" :key="event.value" :value="event.value">
-            {{ event.label }}
+            {{ event.event_name }}
           </option>
         </select>
       </div>
@@ -47,8 +46,7 @@
         <input
           type="text"
           id="description"
-          v-model="form.description"
-          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          v-model="form.hd_event_description" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           placeholder="Optional notes..."
         />
       </div>
@@ -64,6 +62,11 @@
         </button>
       </div>
     </form>
+
+    <div v-if="timeSheetEntries.length" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-800 flex justify-between items-center">
+      <span class="font-semibold">Total Time Expended:</span>
+      <span class="text-xl font-bold">{{ totalDuration }} hours</span>
+    </div>
 
     <div v-if="timeSheetEntries.length" class="mt-8">
       <h4 class="text-md font-semibold mb-3 text-gray-800">Current Time Sheet Entries</h4>
@@ -91,17 +94,15 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="entry in timeSheetEntries" :key="entry.name">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ entry.eventType }}
-              </td>
+                {{ entry.hd_event_ts_name }} </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 {{ entry.duration }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 {{ entry.date }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                {{ entry.description || '-' }}
-              </td>
+              <td class="px-6 py-4 text-sm text-gray-600 max-w-xs">
+                {{ entry.hd_event_description || '-' }} </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
                   type="button"
@@ -123,9 +124,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { call, toast, createResource } from 'frappe-ui';
-// Removed the Button import as we're using native HTML buttons for now
 
 const props = defineProps({
   ticketId: {
@@ -137,69 +137,132 @@ const props = defineProps({
 const emit = defineEmits(['row-added']);
 
 const form = reactive({
-  eventType: '',
+  // IMPORTANT: Changed these to match your DocType fieldnames
+  hd_event_ts_name: '',
   duration: null,
-  date: new Date().toISOString().split('T')[0], // Default to today's date
-  description: '',
+  date: new Date().toISOString().split('T')[0],
+  hd_event_description: '', // IMPORTANT: Changed this to match your DocType fieldname
 });
 
-
-
-//events list for dropdown
-const eventTypes = ref([
-  { label: 'Development', value: 'Development' },
-  { label: 'Meeting', value: 'Meeting' },
-  { label: 'Debugging', value: 'Debugging' },
-  { label: 'Documentation', value: 'Documentation' },
-  { label: 'Testing', value: 'Testing' },
-  { label: 'Support', value: 'Support' },
-  { label: 'Other', value: 'Other' }, 
-]);
+// REMOVE THE STATIC EVENT TYPES ARRAY
+// const eventTypes = ref([
+//   { label: 'Development', value: 'Development' },
+//   // ... other static types
+// ]);
 
 const isLoading = ref(false);
-const timeSheetEntries = ref<any[]>([]); // To display current entries, specify type for better safety
+const timeSheetEntries = ref<any[]>([]);
 
-// Resource to fetch time sheet entries
+const dummyTimeSheetEntries = [
+  // IMPORTANT: Updated dummy data to match new fieldnames
+  {
+    name: 'dummy-1',
+    hd_event_ts_name: 'Development',
+    duration: 3.5,
+    date: '2025-07-23',
+    hd_event_description: 'Working on feature X for ticket #' + props.ticketId,
+  },
+  {
+    name: 'dummy-2',
+    hd_event_ts_name: 'Meeting',
+    duration: 1.0,
+    date: '2025-07-24',
+    hd_event_description: 'Daily stand-up with team',
+  },
+  {
+    name: 'dummy-3',
+    hd_event_ts_name: 'Debugging',
+    duration: 2.0,
+    date: '2025-07-25',
+    hd_event_description: 'Investigated bug in login module',
+  },
+];
+
+const totalDuration = computed(() => {
+  return timeSheetEntries.value.reduce((sum, entry) => {
+    return sum + (typeof entry.duration === 'number' ? entry.duration : 0);
+  }, 0).toFixed(1);
+});
+
+// *** NEW RESOURCE TO FETCH EVENT TYPE NAMES ***
+const eventTypesResource = createResource({
+    url: 'helpdesk.api.ticket_time_sheet.get_event_type_names', // Path to your new API method
+    auto: true,
+    onSuccess: (data) => {        
+        eventTypes.value = Array.isArray(data) ? data : [];
+    },
+    onError: (error) => {
+        console.error("Failed to fetch event types:", error);
+        toast.error('Failed to load event types.');
+        // Fallback to static dummy list if API fails
+        eventTypes.value = [
+            { label: 'Development', value: 'Development' },
+            { label: 'Meeting', value: 'Meeting' },
+            { label: 'Debugging', value: 'Debugging' },
+            { label: 'Documentation', value: 'Documentation' },
+            { label: 'Testing', value: 'Testing' },
+            { label: 'Support', value: 'Support' },
+            { label: 'Other', value: 'Other' },
+        ];
+    }
+});
+const eventTypes = ref([]); // Initialize as empty array, will be filled by eventTypesResource
+
+// Resource to fetch time sheet entries (modified to match new fieldnames)
 const fetchTimeSheet = createResource({
-  url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_time_sheet_entries', // Keep this as your actual API endpoint
+  url: 'helpdesk.api.ticket_time_sheet.get_events',
   auto: true,
   makeParams: () => ({
     ticket_id: props.ticketId,
   }),
   onSuccess: (data) => {
-    // Ensure data is an array before assigning
-    timeSheetEntries.value = Array.isArray(data) ? data : [];
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn("API returned no time sheet entries");
+      timeSheetEntries.value = dummyTimeSheetEntries;
+    } else {
+      timeSheetEntries.value = data.map(entry => ({
+      hd_event_ts_name: entry.event_type,    
+      duration: entry.event_duration,
+      date: entry.event_date,
+      hd_event_description: entry.event_description,        
+      }));
+    }
   },
   onError: (error) => {
-    toast.error('Failed to fetch time sheet entries: ' + (error.message || 'Unknown error'));
-    timeSheetEntries.value = []; // Clear entries on error
+    console.error("Failed to fetch time sheet entries from API. Using dummy data.", error);
+    toast.error('Failed to fetch time sheet entries: ' + (error.messages ? error.messages.join(", ") : error.message || 'Unknown error'));
+    timeSheetEntries.value = dummyTimeSheetEntries;
   },
 });
 
 const addTimeSheetRow = async () => {
-  if (!form.eventType || form.duration === null || form.duration <= 0 || !form.date) {
+  // IMPORTANT: Changed form field references to match new names
+  if (!form.hd_event_ts_name || form.duration === null || form.duration <= 0 || !form.date) {
     toast.error('Please fill in all required fields correctly (Duration must be > 0).');
     return;
   }
 
   isLoading.value = true;
   try {
-    const newEntry = await call('helpdesk.helpdesk.doctype.hd_ticket.api.add_time_sheet_entry', { // Replace with your actual API endpoint
+    await call('helpdesk.api.add_time_sheet_entry', {
       ticket_id: props.ticketId,
-      event_type: form.eventType,
+      event_type: form.hd_event_ts_name, // Pass the value from the updated form field
       duration: form.duration,
       date: form.date,
-      description: form.description,
+      description: form.hd_event_description, // Pass the value from the updated form field
     });
+
     toast.success('Time sheet entry added successfully!');
-    // Clear the form
-    form.eventType = '';
+    // Clear the form - IMPORTANT: Use new fieldnames here
+    form.hd_event_ts_name = '';
     form.duration = null;
-    form.description = '';
-    emit('row-added'); // Emit event to notify parent to reload ticket data or activities
+    form.hd_event_description = '';
+    form.date = new Date().toISOString().split('T')[0]; // Reset date to today
+
+    emit('row-added');
     fetchTimeSheet.reload(); // Reload the list of entries
   } catch (error) {
-    console.error("Error adding time sheet entry:", error); // Log the full error
+    console.error("Error adding time sheet entry:", error);
     const errorMessage = error.messages ? error.messages.join(", ") : (error.message || 'Unknown error');
     toast.error('Failed to add time sheet entry: ' + errorMessage);
   } finally {
@@ -207,25 +270,33 @@ const addTimeSheetRow = async () => {
   }
 };
 
-const deleteTimeSheetEntry = async (entry) => { // Changed to receive the full entry object
+const deleteTimeSheetEntry = async (entry: any) => {
   if (!entry || !entry.name) {
     toast.error("Cannot delete entry: Missing ID.");
     return;
   }
 
-  if (!confirm(`Are you sure you want to delete the entry for "${entry.eventType}" on ${entry.date}?`)) {
+  // IMPORTANT: Use new fieldname for confirm message
+  if (!confirm(`Are you sure you want to delete the entry for "${entry.hd_event_ts_name}" on ${entry.date}?`)) {
     return;
   }
 
   try {
-    await call('helpdesk.helpdesk.doctype.hd_ticket.api.delete_time_sheet_entry', { // Replace with your actual API endpoint
-      entry_id: entry.name, // 'name' is the unique ID for the Frappe Doc
+    if (entry.name && String(entry.name).startsWith('dummy-')) {
+        console.warn(`Attempted to delete dummy entry: ${entry.name}. Not calling API.`);
+        timeSheetEntries.value = timeSheetEntries.value.filter(e => e.name !== entry.name);
+        toast.success('Dummy time sheet entry deleted locally!');
+        return;
+    }
+
+    await call('helpdesk.api.delete_time_sheet_entry', {
+      entry_id: entry.name,
     });
     toast.success('Time sheet entry deleted successfully!');
-    fetchTimeSheet.reload(); // Reload the list of entries
-    emit('row-added'); // Emit event to notify parent if necessary
+    fetchTimeSheet.reload();
+    emit('row-added');
   } catch (error) {
-    console.error("Error deleting time sheet entry:", error); // Log the full error
+    console.error("Error deleting time sheet entry:", error);
     const errorMessage = error.messages ? error.messages.join(", ") : (error.message || 'Unknown error');
     toast.error('Failed to delete time sheet entry: ' + errorMessage);
   }
@@ -233,13 +304,13 @@ const deleteTimeSheetEntry = async (entry) => { // Changed to receive the full e
 
 onMounted(() => {
   fetchTimeSheet.reload();
+  eventTypesResource.reload(); // Trigger fetching event types on mount
 });
 </script>
 
 <style scoped>
-/* You can refine these styles further with Tailwind directives or custom CSS if needed */
+/* Your existing styles remain here */
 .time-sheet-form {
-  /* removed max-width and margin: auto to allow it to fill its container */
   /* padding, border, bg-white, shadow-sm are kept from your original */
 }
 
