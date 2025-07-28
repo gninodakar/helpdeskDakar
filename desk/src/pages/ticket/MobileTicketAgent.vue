@@ -253,7 +253,7 @@ const ticket = createResource({
       });
     }
   },
-  onSuccess: (data) => {
+  onSuccess: (data) => {    
     subjectInput.value = ticket.subject;
     setupCustomizations(ticket, {
       doc: data,

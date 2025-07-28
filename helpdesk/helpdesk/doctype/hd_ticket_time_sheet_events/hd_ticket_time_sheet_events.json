@@ -1,0 +1,99 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:TTS-{ts_ticket_id}-{#####} ",
+ "creation": "2025-07-25 15:32:50.191740",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tts_id",
+  "tts_agent",
+  "tts_ticket_id",
+  "tts_event_type",
+  "tts_event_duration",
+  "tts_event_date",
+  "tts_event_description"
+ ],
+ "fields": [
+  {
+   "fieldname": "tts_id",
+   "fieldtype": "Data",
+   "label": "Time Sheet ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "tts_agent",
+   "fieldtype": "Link",
+   "label": "Agent",
+   "options": "HD Agent"
+  },
+  {
+   "fieldname": "tts_ticket_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket ID",
+   "options": "HD Ticket"
+  },
+  {
+   "fieldname": "tts_event_type",
+   "fieldtype": "Link",
+   "label": "Event Type",
+   "options": "HD Events Type"
+  },
+  {
+   "fieldname": "tts_event_duration",
+   "fieldtype": "Float",
+   "label": "Duration"
+  },
+  {
+   "fieldname": "tts_event_date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "tts_event_description",
+   "fieldtype": "Long Text",
+   "label": "Description"
+  }
+ ],
+ "grid_page_length": 50,
+ "hide_toolbar": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-07-28 16:48:44.389630",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Time Sheet Events",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

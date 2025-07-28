@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class HDTimeSheetEvents(Document):
+class HDTicketTimeSheetEvents(Document):
 	pass

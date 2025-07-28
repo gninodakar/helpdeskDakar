@@ -78,16 +78,7 @@ export default defineConfig({
       "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
     },
   },
-
-    server: {
-    host: '0.0.0.0', // Esto es crucial para el acceso remoto
-    port: 8000,    // Frappe por defecto usa el puerto 8000
-    watch: {
-      usePolling: true, // Esto es clave para la detección de cambios en entornos problemáticos
-      interval: 1000,   // Opcional: Define el intervalo de sondeo en milisegundos (1 segundo por defecto)
-    },
-  },
- 
+  
   optimizeDeps: {
     include: [
       "feather-icons",

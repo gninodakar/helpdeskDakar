@@ -25,7 +25,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-25 15:27:05.160718",
+ "modified": "2025-07-28 11:07:54.615380",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Events Type",
@@ -41,6 +41,17 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
    "share": 1,
    "write": 1
   }

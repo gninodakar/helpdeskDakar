@@ -20,18 +20,25 @@ def get_event_type_names():
 
 @frappe.whitelist(allow_guest=True) 
 def get_events(ticket_id=None):
+    # print(ticket_id)
     try:
+        if not ticket_id:
+            frappe.throw("Ticket ID is required to fetch time sheet events.")
         events_list = frappe.db.get_list(
-            "HD Time Sheet Events", 
-            filters={},            
+            "HD Ticket Time Sheet Events",
+            filters={
+                "ts_ticket_id": ticket_id
+            }, 
             fields=[
-                "name",                  
-                "ts_event_code",         
-                "ts_event_type", 
-                "ts_event_date",                    
-                "ts_event_duration",                     
-                "ts_event_description",                
-                "ts_agent",                              
+                "tts_id",                  
+                "tts_agent",         
+                "tts_ticket_id",                 
+                "tts_event_type",
+                "ts_event_duration",
+                "tts_event_type",
+                "tts_event_duration",                     
+                "tts_event_date",                
+                "tts_event_description",                              
             ],
             order_by="ts_event_code asc" 
         )
@@ -48,3 +55,45 @@ def get_events(ticket_id=None):
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Failed to fetch events from HD Time Sheet Events")
         return []
+    
+
+@frappe.whitelist(allow_guest=False) 
+def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, date=None, description=None):
+    print(ticket_id, event_type_name, duration, date, description)
+    return "ok"
+    # if not all([ticket_id, event_type_name, duration, date]):
+    #     frappe.throw("Ticket ID, Event Type, Duration, and Date are required.")
+
+    # if not isinstance(duration, (int, float)) or duration <= 0:
+    #     frappe.throw("Duration must be a positive number.")
+
+    # try:
+    #     current_user = frappe.session.user
+
+    #     doc = frappe.new_doc("HD Time Sheet Events")
+
+    #     doc.ts_ticket_id = ticket_id
+    #     doc.ts_event_type = event_type_name # Assign the NAME of the linked document
+    #     doc.ts_event_duration = float(duration)
+    #     # doc.ts_event_date = date
+    #     doc.ts_event_description = description
+    #     doc.ts_agent = current_user
+    #     doc.ts_ticket_name = ticket_name
+
+    #     # For ts_event_code, consider if it's auto-generated in your DocType
+    #     # If not, ensure it's unique.
+    #     # Example if you need to generate a unique code:
+    #     doc.ts_event_code = f"{ticket_id}-{event_type_name}-{frappe.utils.now_datetime().strftime('%Y%m%d%H%M%S')}"
+
+    #     doc.insert()
+    #     frappe.db.commit()
+
+    #     frappe.msgprint("Time Sheet entry added successfully!")
+    #     return {"message": "Time Sheet entry added successfully!", "name": doc.name}
+
+    # except Exception as e:
+    #     frappe.db.rollback()
+    #     frappe.log_error(frappe.get_traceback(), "Failed to add time sheet entry")
+    #     frappe.throw(f"Failed to add time sheet entry: {e}")
+
+        

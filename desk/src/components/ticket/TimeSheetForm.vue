@@ -48,6 +48,7 @@
           id="description"
           v-model="form.hd_event_description" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           placeholder="Optional notes..."
+          required
         />
       </div>
 
@@ -95,6 +96,8 @@
             <tr v-for="entry in timeSheetEntries" :key="entry.name">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ entry.hd_event_ts_name }} </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {{ entry.hd_event_ts_name }} </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 {{ entry.duration }}
               </td>
@@ -136,8 +139,7 @@ const props = defineProps({
 
 const emit = defineEmits(['row-added']);
 
-const form = reactive({
-  // IMPORTANT: Changed these to match your DocType fieldnames
+const form = reactive({  
   hd_event_ts_name: '',
   duration: null,
   date: new Date().toISOString().split('T')[0],
@@ -153,29 +155,30 @@ const form = reactive({
 const isLoading = ref(false);
 const timeSheetEntries = ref<any[]>([]);
 
+
+//dummy data
 const dummyTimeSheetEntries = [
-  // IMPORTANT: Updated dummy data to match new fieldnames
-  {
-    name: 'dummy-1',
-    hd_event_ts_name: 'Development',
-    duration: 3.5,
-    date: '2025-07-23',
-    hd_event_description: 'Working on feature X for ticket #' + props.ticketId,
-  },
-  {
-    name: 'dummy-2',
-    hd_event_ts_name: 'Meeting',
-    duration: 1.0,
-    date: '2025-07-24',
-    hd_event_description: 'Daily stand-up with team',
-  },
-  {
-    name: 'dummy-3',
-    hd_event_ts_name: 'Debugging',
-    duration: 2.0,
-    date: '2025-07-25',
-    hd_event_description: 'Investigated bug in login module',
-  },
+  // {
+  //   name: 'dummy-1',
+  //   hd_event_ts_name: 'Development',
+  //   duration: 3.5,
+  //   date: '2025-07-23',
+  //   hd_event_description: 'Working on feature X for ticket #' + props.ticketId,
+  // },
+  // {
+  //   name: 'dummy-2',
+  //   hd_event_ts_name: 'Meeting',
+  //   duration: 1.0,
+  //   date: '2025-07-24',
+  //   hd_event_description: 'Daily stand-up with team',
+  // },
+  // {
+  //   name: 'dummy-3',
+  //   hd_event_ts_name: 'Debugging',
+  //   duration: 2.0,
+  //   date: '2025-07-25',
+  //   hd_event_description: 'Investigated bug in login module',
+  // },
 ];
 
 const totalDuration = computed(() => {
@@ -186,7 +189,7 @@ const totalDuration = computed(() => {
 
 // *** NEW RESOURCE TO FETCH EVENT TYPE NAMES ***
 const eventTypesResource = createResource({
-    url: 'helpdesk.api.ticket_time_sheet.get_event_type_names', // Path to your new API method
+    url: 'helpdesk.api.ticket_time_sheet.get_event_type_names', //path to API
     auto: true,
     onSuccess: (data) => {        
         eventTypes.value = Array.isArray(data) ? data : [];
@@ -208,7 +211,7 @@ const eventTypesResource = createResource({
 });
 const eventTypes = ref([]); // Initialize as empty array, will be filled by eventTypesResource
 
-// Resource to fetch time sheet entries (modified to match new fieldnames)
+//fetch the Time sheet events
 const fetchTimeSheet = createResource({
   url: 'helpdesk.api.ticket_time_sheet.get_events',
   auto: true,
@@ -220,8 +223,8 @@ const fetchTimeSheet = createResource({
       console.warn("API returned no time sheet entries");
       timeSheetEntries.value = dummyTimeSheetEntries;
     } else {
-      timeSheetEntries.value = data.map(entry => ({
-      hd_event_ts_name: entry.event_type,    
+      timeSheetEntries.value = data.map(entry => ({      
+      hd_event_ts_name: entry.event_type, 
       duration: entry.event_duration,
       date: entry.event_date,
       hd_event_description: entry.event_description,        
@@ -235,25 +238,28 @@ const fetchTimeSheet = createResource({
   },
 });
 
-const addTimeSheetRow = async () => {
-  // IMPORTANT: Changed form field references to match new names
+
+//add new time sheet entry
+/////////////////////////////////////
+const addTimeSheetRow = async () => {  
   if (!form.hd_event_ts_name || form.duration === null || form.duration <= 0 || !form.date) {
-    toast.error('Please fill in all required fields correctly (Duration must be > 0).');
+    toast.error('Please fill in all required fields correctly (Duration must be mayor 0).');
     return;
   }
 
   isLoading.value = true;
+
   try {
-    await call('helpdesk.api.add_time_sheet_entry', {
+    await call('helpdesk.api.ticket_time_sheet.add_time_sheet_entry', {
       ticket_id: props.ticketId,
-      event_type: form.hd_event_ts_name, // Pass the value from the updated form field
+      event_type_name: form.hd_event_ts_name, 
       duration: form.duration,
       date: form.date,
-      description: form.hd_event_description, // Pass the value from the updated form field
+      description: form.hd_event_description, 
     });
 
     toast.success('Time sheet entry added successfully!');
-    // Clear the form - IMPORTANT: Use new fieldnames here
+    // Clear the form 
     form.hd_event_ts_name = '';
     form.duration = null;
     form.hd_event_description = '';
@@ -309,7 +315,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Your existing styles remain here */
+/* styles */
 .time-sheet-form {
   /* padding, border, bg-white, shadow-sm are kept from your original */
 }

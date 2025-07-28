@@ -227,6 +227,7 @@ const ticket = createResource({
     renameSubject.value = data.subject;
   },
   onSuccess: (data) => {
+    // console.log(data);
     document.title = data.subject;
     setupCustomizations(ticket, {
       doc: data,
