@@ -1,24 +1,51 @@
 <template>
   <div class="time-sheet-form p-4 border rounded-md bg-white shadow-sm">
-    <h3 class="text-lg font-semibold mb-4 text-gray-800">Add Time Sheet Entry</h3>
-
-    <form @submit.prevent="addTimeSheetRow" class="flex flex-wrap items-end gap-4 mb-8">
+    <h3 class="text-lg font-semibold mb-4 text-gray-800">
+      Add Time Sheet Entry
+    </h3>
+    <div class="flex justify-start mb-4">
+      <button
+        class="rounded bg-teal-500 px-3 py-1.5 text-base text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+        @click="sendTicketpdf"
+        title="Email Ticket as PDF"
+      >
+        Email Ticket PDF
+      </button>
+    </div>
+    <div class="flex justify-start mb-4"></div>
+    <form
+      @submit.prevent="addTimeSheetRow"
+      class="flex flex-wrap items-end gap-4 mb-8"
+    >
       <div class="flex-1 min-w-[150px]">
-        <label for="eventType" class="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
+        <label
+          for="eventType"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Event</label
+        >
         <select
           id="eventType"
-          v-model="form.hd_event_ts_name" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          v-model="form.type_event"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           required
         >
           <option value="">Select event</option>
-          <option v-for="event in eventTypes" :key="event.value" :value="event.value">
+          <option
+            v-for="event in eventTypes"
+            :key="event.value"
+            :value="event.value"
+          >
             {{ event.event_name }}
           </option>
         </select>
       </div>
 
       <div class="flex-grow min-w-[100px]">
-        <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
+        <label
+          for="duration"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Duration (hours)</label
+        >
         <input
           type="number"
           id="duration"
@@ -31,7 +58,9 @@
       </div>
 
       <div class="flex-grow min-w-[150px]">
-        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+        <label for="date" class="block text-sm font-medium text-gray-700 mb-1"
+          >Date</label
+        >
         <input
           type="date"
           id="date"
@@ -42,16 +71,20 @@
       </div>
 
       <div class="flex-auto min-w-[200px]">
-        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <input
-          type="text"
+        <label
+          for="description"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Description</label
+        >
+        <textarea
           id="description"
-          v-model="form.hd_event_description" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          v-model="form.hd_event_description"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           placeholder="Optional notes..."
+          rows="3"
           required
-        />
+        ></textarea>
       </div>
-
       <div class="flex-shrink-0">
         <button
           type="submit"
@@ -59,32 +92,60 @@
           class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
         >
-          {{ isLoading ? 'Adding...' : 'Add Entry' }}
+          {{ isLoading ? "Adding..." : "Add Entry" }}
         </button>
       </div>
     </form>
-
-    <div v-if="timeSheetEntries.length" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-800 flex justify-between items-center">
+    <div
+      v-if="timeSheetEntries.length"
+      class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-800 flex justify-between items-center"
+    >
       <span class="font-semibold">Total Time Expended:</span>
       <span class="text-xl font-bold">{{ totalDuration }} hours</span>
     </div>
 
     <div v-if="timeSheetEntries.length" class="mt-8">
-      <h4 class="text-md font-semibold mb-3 text-gray-800">Current Time Sheet Entries</h4>
+      <h4 class="text-md font-semibold mb-3 text-gray-800">
+        Current Time Sheet Entries
+      </h4>
       <div class="overflow-x-auto border border-gray-200 rounded-md">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Event Type
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                ID
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Duration (hrs)
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Agent
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Event
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                (hrs)
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Date
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Description
               </th>
               <th scope="col" class="relative px-6 py-3">
@@ -94,10 +155,21 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="entry in timeSheetEntries" :key="entry.name">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ entry.hd_event_ts_name }} </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {{ entry.hd_event_ts_name }} </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ entry.id }}
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ entry.agent }}
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ entry.type_event }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 {{ entry.duration }}
               </td>
@@ -105,14 +177,19 @@
                 {{ entry.date }}
               </td>
               <td class="px-6 py-4 text-sm text-gray-600 max-w-xs">
-                {{ entry.hd_event_description || '-' }} </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                {{ entry.hd_event_description || "-" }}
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+              >
                 <button
                   type="button"
                   @click="deleteTimeSheetEntry(entry)"
-                  class="text-red-600 hover:text-red-900"
+                  class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  title="Delete Entry"
                 >
-                  Delete
+                  <FeatherIcon name="trash-2" class="h-5 w-5" />
+                  <span class="sr-only">Delete</span>
                 </button>
               </td>
             </tr>
@@ -120,15 +197,18 @@
         </table>
       </div>
     </div>
-    <div v-else class="mt-8 p-4 text-center text-gray-500 border border-dashed rounded-md">
+    <div
+      v-else
+      class="mt-8 p-4 text-center text-gray-500 border border-dashed rounded-md"
+    >
       No time sheet entries added yet.
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
-import { call, toast, createResource } from 'frappe-ui';
+import { ref, reactive, onMounted, computed } from "vue";
+import { call, toast, createResource, dayjs } from "frappe-ui";
 
 const props = defineProps({
   ticketId: {
@@ -137,174 +217,248 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['row-added']);
+const emit = defineEmits(["row-added"]);
 
-const form = reactive({  
-  hd_event_ts_name: '',
+const form = reactive({
+  type_event: "",
   duration: null,
-  date: new Date().toISOString().split('T')[0],
-  hd_event_description: '', // IMPORTANT: Changed this to match your DocType fieldname
+  date: new Date().toISOString().split("T")[0],
+  hd_event_description: "",
 });
-
-// REMOVE THE STATIC EVENT TYPES ARRAY
-// const eventTypes = ref([
-//   { label: 'Development', value: 'Development' },
-//   // ... other static types
-// ]);
 
 const isLoading = ref(false);
 const timeSheetEntries = ref<any[]>([]);
 
-
-//dummy data
-const dummyTimeSheetEntries = [
-  // {
-  //   name: 'dummy-1',
-  //   hd_event_ts_name: 'Development',
-  //   duration: 3.5,
-  //   date: '2025-07-23',
-  //   hd_event_description: 'Working on feature X for ticket #' + props.ticketId,
-  // },
-  // {
-  //   name: 'dummy-2',
-  //   hd_event_ts_name: 'Meeting',
-  //   duration: 1.0,
-  //   date: '2025-07-24',
-  //   hd_event_description: 'Daily stand-up with team',
-  // },
-  // {
-  //   name: 'dummy-3',
-  //   hd_event_ts_name: 'Debugging',
-  //   duration: 2.0,
-  //   date: '2025-07-25',
-  //   hd_event_description: 'Investigated bug in login module',
-  // },
-];
+// dummy data for testing
+const dummyTimeSheetEntries = [];
 
 const totalDuration = computed(() => {
-  return timeSheetEntries.value.reduce((sum, entry) => {
-    return sum + (typeof entry.duration === 'number' ? entry.duration : 0);
-  }, 0).toFixed(1);
+  return timeSheetEntries.value
+    .reduce((sum, entry) => {
+      return sum + (typeof entry.duration === "number" ? entry.duration : 0);
+    }, 0)
+    .toFixed(1);
 });
 
-// *** NEW RESOURCE TO FETCH EVENT TYPE NAMES ***
+/* ******************************** */
+// send pdf data
+/* ******************************** */
+// const sendTicketpdf = async () => {
+//   console.log("Ticket ID:", props.ticketId);
+//   try {
+//     await call("helpdesk.api.ticket_time_sheet.send_report_pdf", {
+//       ticket_id: props.ticketId,
+//     });
+
+//     toast.success("Time sheet entry added successfully!");
+//   } catch (error) {
+//     console.error("Error adding time sheet entry:", error);
+//     const errorMessage = error.messages
+//       ? error.messages.join(", ")
+//       : error.message || "Unknown error";
+//     toast.error("Failed to add time sheet entry: " + errorMessage);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+const ticket = {
+  data: {
+    name: "TICKET-007",
+    subject: "My Sample Ticket",
+    raised_by: "ganpforrest@gmail.com",
+  },
+}; // Dummy for example
+
+const sendTicketpdf = async () => {
+  // ... (lógica para determinar destinatarios, pdfTitle, customText) ...
+  const recipients = ["destinatario@ejemplo.com"]; // Correo del destinatario
+  const pdfTitle = "Mis Notas Personalizadas";
+  const customText = "Este es un texto de prueba para el PDF.";
+
+  // --- El nombre de la cuenta de correo que quieres usar como remitente ---
+  // Debes poner la DIRECCIÓN DE CORREO EXACTA (Email Id) que está configurada
+  // en la "Cuenta de Correo" de Frappe que deseas usar.
+  // Por ejemplo, si tienes una cuenta llamada "Soporte Interno" con el Email Id "soporte@tuempresa.com",
+  // usarías "soporte@tuempresa.com" aquí.
+  const senderEmail = "ganpforrest@gmail.com"; // <-- ¡REEMPLAZA CON TU DIRECCIÓN DE CORREO CONFIGURADA!
+
+  try {
+    await call("helpdesk.api.ticket_time_sheet.send_report_pdf", {
+      recipients: recipients,
+      pdf_title: pdfTitle,
+      pdf_text_content: customText,
+      sender_email_address: senderEmail, // <-- ¡Pasa la dirección de correo del remitente!
+    });
+
+    toast.success("Correo con PDF personalizado enviado exitosamente.");
+  } catch (error) {
+    console.error("Error al enviar correo con PDF:", error);
+    const errorMessage = error.messages
+      ? error.messages.join(", ")
+      : error.message || "Error desconocido";
+    toast.error("Error al enviar correo con PDF: " + errorMessage);
+  }
+};
+
+/* ******************************** */
+// NEW RESOURCE TO FETCH EVENT TYPE NAMES
+/* ******************************** */
 const eventTypesResource = createResource({
-    url: 'helpdesk.api.ticket_time_sheet.get_event_type_names', //path to API
-    auto: true,
-    onSuccess: (data) => {        
-        eventTypes.value = Array.isArray(data) ? data : [];
-    },
-    onError: (error) => {
-        console.error("Failed to fetch event types:", error);
-        toast.error('Failed to load event types.');
-        // Fallback to static dummy list if API fails
-        eventTypes.value = [
-            { label: 'Development', value: 'Development' },
-            { label: 'Meeting', value: 'Meeting' },
-            { label: 'Debugging', value: 'Debugging' },
-            { label: 'Documentation', value: 'Documentation' },
-            { label: 'Testing', value: 'Testing' },
-            { label: 'Support', value: 'Support' },
-            { label: 'Other', value: 'Other' },
-        ];
-    }
+  url: "helpdesk.api.ticket_time_sheet.get_event_type_names",
+  auto: true,
+  onSuccess: (data) => {
+    eventTypes.value = Array.isArray(data) ? data : [];
+  },
+  onError: (error) => {
+    console.error("Failed to fetch event types:", error);
+    toast.error("Failed to load event types.");
+    // Fallback to static dummy list if API fails
+    eventTypes.value = [
+      { label: "Development", value: "Development" },
+      { label: "Meeting", value: "Meeting" },
+      { label: "Debugging", value: "Debugging" },
+      { label: "Documentation", value: "Documentation" },
+      { label: "Testing", value: "Testing" },
+      { label: "Support", value: "Support" },
+      { label: "Other", value: "Other" },
+    ];
+  },
 });
 const eventTypes = ref([]); // Initialize as empty array, will be filled by eventTypesResource
 
-//fetch the Time sheet events
+/* ******************************** */
+// Fetch ticket events
+/* ******************************** */
 const fetchTimeSheet = createResource({
-  url: 'helpdesk.api.ticket_time_sheet.get_events',
+  url: "helpdesk.api.ticket_time_sheet.get_events",
   auto: true,
   makeParams: () => ({
     ticket_id: props.ticketId,
   }),
   onSuccess: (data) => {
+    console.log(data);
     if (!Array.isArray(data) || data.length === 0) {
       console.warn("API returned no time sheet entries");
       timeSheetEntries.value = dummyTimeSheetEntries;
     } else {
-      timeSheetEntries.value = data.map(entry => ({      
-      hd_event_ts_name: entry.event_type, 
-      duration: entry.event_duration,
-      date: entry.event_date,
-      hd_event_description: entry.event_description,        
+      timeSheetEntries.value = data.map((entry) => ({
+        id: entry.tts_id,
+        agent: entry.tts_agent,
+        type_event: entry.tts_event_type,
+        duration: entry.tts_event_duration,
+        date: entry.tts_event_date,
+        hd_event_description: entry.tts_event_description,
       }));
     }
   },
   onError: (error) => {
-    console.error("Failed to fetch time sheet entries from API. Using dummy data.", error);
-    toast.error('Failed to fetch time sheet entries: ' + (error.messages ? error.messages.join(", ") : error.message || 'Unknown error'));
+    console.error(
+      "Failed to fetch time sheet entries from API. Using dummy data.",
+      error
+    );
+    toast.error(
+      "Failed to fetch time sheet entries: " +
+        (error.messages
+          ? error.messages.join(", ")
+          : error.message || "Unknown error")
+    );
     timeSheetEntries.value = dummyTimeSheetEntries;
   },
 });
 
-
-//add new time sheet entry
-/////////////////////////////////////
-const addTimeSheetRow = async () => {  
-  if (!form.hd_event_ts_name || form.duration === null || form.duration <= 0 || !form.date) {
-    toast.error('Please fill in all required fields correctly (Duration must be mayor 0).');
+/* ******************************** */
+// Add new event to ticket
+/* ******************************** */
+const addTimeSheetRow = async () => {
+  if (
+    !form.type_event ||
+    form.duration === null ||
+    form.duration <= 0 ||
+    !form.date
+  ) {
+    toast.error(
+      "Please fill in all required fields correctly (Duration must be mayor 0)."
+    );
     return;
   }
 
   isLoading.value = true;
 
   try {
-    await call('helpdesk.api.ticket_time_sheet.add_time_sheet_entry', {
+    let dateToSend = dayjs(form.date).format("YYYY-MM-DD");
+
+    await call("helpdesk.api.ticket_time_sheet.add_time_sheet_entry", {
       ticket_id: props.ticketId,
-      event_type_name: form.hd_event_ts_name, 
+      event_type_name: form.type_event,
       duration: form.duration,
-      date: form.date,
-      description: form.hd_event_description, 
+      date: dateToSend,
+      description: form.hd_event_description,
     });
 
-    toast.success('Time sheet entry added successfully!');
-    // Clear the form 
-    form.hd_event_ts_name = '';
+    toast.success("Time sheet entry added successfully!");
+    // Clear the form
+    form.type_event = "";
     form.duration = null;
-    form.hd_event_description = '';
-    form.date = new Date().toISOString().split('T')[0]; // Reset date to today
+    form.hd_event_description = "";
+    form.date = new Date().toISOString().split("T")[0]; // Reset date to today
 
-    emit('row-added');
+    emit("row-added");
     fetchTimeSheet.reload(); // Reload the list of entries
   } catch (error) {
     console.error("Error adding time sheet entry:", error);
-    const errorMessage = error.messages ? error.messages.join(", ") : (error.message || 'Unknown error');
-    toast.error('Failed to add time sheet entry: ' + errorMessage);
+    const errorMessage = error.messages
+      ? error.messages.join(", ")
+      : error.message || "Unknown error";
+    toast.error("Failed to add time sheet entry: " + errorMessage);
   } finally {
     isLoading.value = false;
   }
 };
 
+/* ******************************** */
+// Delete event ticket
+/* ******************************** */
+
 const deleteTimeSheetEntry = async (entry: any) => {
-  if (!entry || !entry.name) {
+  if (!entry || !entry.id) {
     toast.error("Cannot delete entry: Missing ID.");
     return;
   }
 
   // IMPORTANT: Use new fieldname for confirm message
-  if (!confirm(`Are you sure you want to delete the entry for "${entry.hd_event_ts_name}" on ${entry.date}?`)) {
+  if (
+    !confirm(
+      `Are you sure you want to delete the entry ID: "${entry.id}" on ${entry.date}?`
+    )
+  ) {
     return;
   }
 
   try {
-    if (entry.name && String(entry.name).startsWith('dummy-')) {
-        console.warn(`Attempted to delete dummy entry: ${entry.name}. Not calling API.`);
-        timeSheetEntries.value = timeSheetEntries.value.filter(e => e.name !== entry.name);
-        toast.success('Dummy time sheet entry deleted locally!');
-        return;
+    if (entry.id && String(entry.id).startsWith("dummy-")) {
+      console.warn(
+        `Attempted to delete dummy entry: ${entry.id}. Not calling API.`
+      );
+      timeSheetEntries.value = timeSheetEntries.value.filter(
+        (e) => e.id !== entry.id
+      );
+      toast.success("Dummy time sheet entry deleted locally!");
+      return;
     }
 
-    await call('helpdesk.api.delete_time_sheet_entry', {
-      entry_id: entry.name,
+    await call("helpdesk.api.ticket_time_sheet.delete_time_sheet_entry", {
+      entry_id: entry.id,
     });
-    toast.success('Time sheet entry deleted successfully!');
+    toast.success("Time sheet entry deleted successfully!");
     fetchTimeSheet.reload();
-    emit('row-added');
+    emit("row-added");
   } catch (error) {
     console.error("Error deleting time sheet entry:", error);
-    const errorMessage = error.messages ? error.messages.join(", ") : (error.message || 'Unknown error');
-    toast.error('Failed to delete time sheet entry: ' + errorMessage);
+    const errorMessage = error.messages
+      ? error.messages.join(", ")
+      : error.message || "Unknown error";
+    toast.error("Failed to delete time sheet entry: " + errorMessage);
   }
 };
 
@@ -315,7 +469,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* styles */
+/********************************/
+/* styles                         */
+/********************************/
 .time-sheet-form {
   /* padding, border, bg-white, shadow-sm are kept from your original */
 }
@@ -353,7 +509,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 0.75rem 1.5rem; /* Tailwind: px-6 py-4 for td, px-6 py-3 for th */
   text-align: left;
 }

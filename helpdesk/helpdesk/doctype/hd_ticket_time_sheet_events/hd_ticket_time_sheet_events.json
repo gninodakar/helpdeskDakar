@@ -1,12 +1,10 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "format:TTS-{ts_ticket_id}-{#####} ",
+ "autoname": "format:TTS-{tts_ticket_id}-{#####} ",
  "creation": "2025-07-25 15:32:50.191740",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "tts_id",
   "tts_agent",
   "tts_ticket_id",
   "tts_event_type",
@@ -16,17 +14,9 @@
  ],
  "fields": [
   {
-   "fieldname": "tts_id",
-   "fieldtype": "Data",
-   "label": "Time Sheet ID",
-   "read_only": 1,
-   "unique": 1
-  },
-  {
    "fieldname": "tts_agent",
-   "fieldtype": "Link",
-   "label": "Agent",
-   "options": "HD Agent"
+   "fieldtype": "Data",
+   "label": "Agent"
   },
   {
    "fieldname": "tts_ticket_id",
@@ -61,7 +51,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-28 16:48:44.389630",
+ "modified": "2025-07-29 13:43:58.838657",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Sheet Events",
@@ -95,5 +85,6 @@
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
