@@ -74,7 +74,7 @@ def send_report_pdf():
         frappe.throw(("Failed to send email: {0}").format(str(e)))
        
 ##############################
-# Fetch events storeged
+# Fetch events by ticket ID
 ##############################
 @frappe.whitelist(allow_guest=False) 
 def get_events(ticket_id=None):
@@ -85,6 +85,7 @@ def get_events(ticket_id=None):
     try:
         if not ticket_id:
             frappe.throw("Ticket ID is required to fetch time sheet events.")
+        print(ticket_id)
         events_list = frappe.db.get_list(
             "HD Ticket Time Sheet Events",
             filters={
@@ -100,8 +101,11 @@ def get_events(ticket_id=None):
                 "tts_event_date",                
                 "tts_event_description",                              
             ],
-            order_by="ts_event_code asc" 
+            order_by="name asc" 
         )
+        print(events_list)
+        if not events_list:
+            print("No events found for this ticket ID.")
         return [{
             "tts_id": item.name,
             "tts_agent": item.tts_agent,

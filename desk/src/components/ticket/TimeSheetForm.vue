@@ -329,8 +329,7 @@ const fetchTimeSheet = createResource({
   makeParams: () => ({
     ticket_id: props.ticketId,
   }),
-  onSuccess: (data) => {
-    console.log(data);
+  onSuccess: (data) => {    
     if (!Array.isArray(data) || data.length === 0) {
       console.warn("API returned no time sheet entries");
       timeSheetEntries.value = dummyTimeSheetEntries;
