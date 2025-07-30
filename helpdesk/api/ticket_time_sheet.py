@@ -25,105 +25,53 @@ def get_event_type_names():
 ##############################
 # send ticket by pdf
 ##############################
-# @frappe.whitelist(allow_guest = False)
-# def send_report_pdf(ticket_id):
-#     print(ticket_id)
 @frappe.whitelist(allow_guest=False)
-def send_report_pdf(
-    recipients,
-    pdf_title="Documento Personalizado",
-    pdf_text_content="No se ha proporcionado contenido.",
-    email_subject=None,
-    email_message=None,
-    sender_email_address=None, # <--- CAMBIADO: Ahora se espera la DIRECCIÓN de correo del remitente
-):
-    """
-    Genera un PDF con contenido de texto personalizado y lo envía como un adjunto de correo electrónico.
+def send_report_pdf():    
+    recipients = ['guillermo@albanss.com']    
+    product_data = {
+        'Samsung Galaxy S20': 10,
+        'iPhone 13': 80
+    }
 
-    :param recipients: Dirección(es) de correo electrónico a las que se enviará el PDF (cadena separada por comas o lista).
-    :param pdf_title: Título que aparecerá en la parte superior del PDF y como nombre de archivo.
-    :param pdf_text_content: El contenido de texto principal que se colocará dentro del PDF.
-    :param email_subject: Asunto personalizado del correo electrónico. Si es None, se genera uno por defecto.
-    :param email_message: Cuerpo del mensaje del correo electrónico (puede ser HTML). Si es None, se genera uno por defecto.
-    :param sender_email_address: La dirección de correo electrónico exacta (Email Id) de la "Cuenta de Correo" configurada en Frappe a usar como remitente.
-                                 Si es None, Frappe utilizará la cuenta de correo saliente predeterminada.
-    """
-    if not recipients:
-        frappe.throw(_("Se requieren destinatarios para enviar el correo electrónico."))
-    if not pdf_title:
-        frappe.throw(_("Se requiere el título del PDF."))
+    # Generate PDF HTML content
+    html_content = '<h1>Invoice from Star Electronics e-Store!</h1>'
+    html_content += '<ol>'
+    # Loop correctly over the dictionary items
+    for item, qty in product_data.items():
+        html_content += f'<li>{frappe.utils.escape_html(item)} - {qty}</li>' # Escape HTML for safety
+    html_content += '</ol>'
 
+    # Generate PDF
+    pdf_bytes = get_pdf(html_content, options={
+        'margin-top': 10,
+        'margin-right': 10,
+        'margin-bottom': 10,
+        'margin-left': 10,
+        'orientation': 'Portrait',
+        'page-size': 'Letter',
+    })
+
+    # Send email
     try:
-        # Asegurarse de que recipients sea una lista
-        if isinstance(recipients, str):
-            recipients = [r.strip() for r in recipients.split(",") if r.strip()]
-
-        # Preparar asunto y mensaje predeterminados si no se proporcionan
-        if not email_subject:
-            email_subject = _("Tu Documento Personalizado: {0}").format(pdf_title)
-        if not email_message:
-            email_message = _(
-                """Estimado(a) destinatario(a),
-
-                Adjunto encontrarás el documento PDF personalizado que solicitaste: "{0}".
-
-                Saludos cordiales,
-                {1}"""
-            ).format(pdf_title, frappe.session.user)
-
-        # 1. Crear contenido HTML para el PDF
-        pdf_html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>{pdf_title}</title>
-            <style>
-                body {{ font-family: sans-serif; margin: 40px; }}
-                h1 {{ color: #333; font-size: 24px; margin-bottom: 20px; }}
-                pre {{ white-space: pre-wrap; word-wrap: break-word; font-family: monospace; background-color: #f8f8f8; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }}
-                p {{ line-height: 1.6; }}
-            </style>
-        </head>
-        <body>
-            <h1>{pdf_title}</h1>
-            <pre>{frappe.utils.escape_html(pdf_text_content)}</pre>
-            <p>Generado el {frappe.utils.formatdate(frappe.utils.nowdate())} por {frappe.session.user}</p>
-        </body>
-        </html>
-        """
-
-        # 2. Generar los bytes del PDF a partir del contenido HTML
-        actual_file_name = f"{pdf_title.replace(' ', '_').replace('/', '-')}.pdf"
-        pdf_bytes = get_pdf(pdf_html_content)
-
-        # 3. Preparar el diccionario del adjunto
-        attachment = {
-            "fname": actual_file_name,
-            "fcontent": pdf_bytes,
-            "is_private": 0
-        }
-
-        # --- CAMBIO CLAVE: Usar frappe.sendmail() con el parámetro 'sender' ---
         frappe.sendmail(
             recipients=recipients,
-            sender=sender_email_address, # <--- Usar la dirección de correo del remitente aquí
-            subject=email_subject,
-            message=email_message,
-            attachments=[attachment],
-            # Puedes añadir reference_doctype y reference_name si quieres que el email
-            # aparezca en la línea de tiempo de un documento específico (ej. un ticket)
-            # reference_doctype="HD Ticket",
-            # reference_name="TICKET-001"
+            subject='Invoice from Star Electronics e-Store',
+            message=html_content, 
+            attachments=[{
+                'fname': 'invoice.pdf',
+                'fcontent': pdf_bytes
+            }],            
+            now = True
         )
-        # --- FIN CAMBIO CLAVE ---
+        frappe.db.commit() 
 
-        frappe.msgprint(_("Correo electrónico con PDF personalizado enviado exitosamente a {0}").format(", ".join(recipients)))
-        return {"status": "success", "message": _("¡Correo enviado exitosamente!")}
+        frappe.msgprint(("Email sent successfully to {0}").format(", ".join(recipients)))
+        return {"status": "success", "message": ("Email sent successfully!")}
 
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), _("Error al enviar correo electrónico con PDF personalizado."))
-        frappe.throw(_("Error al enviar correo: {0}").format(str(e)))
+        frappe.db.rollback() 
+        frappe.log_error(frappe.get_traceback(), "Failed to send report PDF")
+        frappe.throw(("Failed to send email: {0}").format(str(e)))
     
  
     
