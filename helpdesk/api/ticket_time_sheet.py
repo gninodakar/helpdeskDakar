@@ -72,9 +72,7 @@ def send_report_pdf():
         frappe.db.rollback() 
         frappe.log_error(frappe.get_traceback(), "Failed to send report PDF")
         frappe.throw(("Failed to send email: {0}").format(str(e)))
-    
- 
-    
+       
 ##############################
 # Fetch events storeged
 ##############################
@@ -109,8 +107,7 @@ def get_events(ticket_id=None):
             "tts_agent": item.tts_agent,
             "tts_ticket_id": item.tts_ticket_id,
             "tts_event_type": item.tts_event_type,
-            "tts_event_duration": item.tts_event_duration,
-            "tts_event_type": item.tts_event_type,            
+            "tts_event_duration": item.tts_event_duration,    
             "tts_event_date": item.tts_event_date  if hasattr(item, 'entry_date') else None,
             "tts_event_description": item.tts_event_description 
             
