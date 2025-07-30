@@ -270,34 +270,27 @@ const ticket = {
   },
 }; // Dummy for example
 
-const sendTicketpdf = async () => {
-  // ... (lógica para determinar destinatarios, pdfTitle, customText) ...
-  const recipients = ["destinatario@ejemplo.com"]; // Correo del destinatario
-  const pdfTitle = "Mis Notas Personalizadas";
-  const customText = "Este es un texto de prueba para el PDF.";
-
-  // --- El nombre de la cuenta de correo que quieres usar como remitente ---
-  // Debes poner la DIRECCIÓN DE CORREO EXACTA (Email Id) que está configurada
-  // en la "Cuenta de Correo" de Frappe que deseas usar.
-  // Por ejemplo, si tienes una cuenta llamada "Soporte Interno" con el Email Id "soporte@tuempresa.com",
-  // usarías "soporte@tuempresa.com" aquí.
-  const senderEmail = "ganpforrest@gmail.com"; // <-- ¡REEMPLAZA CON TU DIRECCIÓN DE CORREO CONFIGURADA!
+const sendTicketpdf = async () => {  
+  const recipients = ["guillermo@albanss.com"]; 
+  const pdfTitle = "My Personalised Notes";
+  const customText = "This is a proof text for the PDF.";
+  const senderEmail = "ganpforrest@gmail.com"; 
 
   try {
     await call("helpdesk.api.ticket_time_sheet.send_report_pdf", {
       recipients: recipients,
       pdf_title: pdfTitle,
       pdf_text_content: customText,
-      sender_email_address: senderEmail, // <-- ¡Pasa la dirección de correo del remitente!
+      sender_email_address: senderEmail, 
     });
 
-    toast.success("Correo con PDF personalizado enviado exitosamente.");
+    toast.success("Email with personalised PDF successfully sent.");
   } catch (error) {
-    console.error("Error al enviar correo con PDF:", error);
+    console.error("Error when sending mail with PDF:", error);
     const errorMessage = error.messages
       ? error.messages.join(", ")
-      : error.message || "Error desconocido";
-    toast.error("Error al enviar correo con PDF: " + errorMessage);
+      : error.message || "Unknown error";
+    toast.error("Error when sending mail with PDF: " + errorMessage);
   }
 };
 
