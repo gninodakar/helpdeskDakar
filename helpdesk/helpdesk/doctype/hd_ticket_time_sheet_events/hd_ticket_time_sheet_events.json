@@ -33,7 +33,7 @@
   },
   {
    "fieldname": "tts_event_duration",
-   "fieldtype": "Float",
+   "fieldtype": "Time",
    "label": "Duration"
   },
   {
@@ -51,7 +51,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-29 13:43:58.838657",
+ "modified": "2025-07-31 13:46:04.486087",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Sheet Events",

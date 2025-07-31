@@ -1,6 +1,7 @@
 import frappe 
 from frappe import _
 from frappe.utils.pdf import get_pdf 
+from frappe.utils import format_duration
 
 ##############################
 # Fetch event types selectbox
@@ -34,12 +35,14 @@ def send_report_pdf():
     }
 
     # Generate PDF HTML content
-    html_content = '<h1>Invoice from Star Electronics e-Store!</h1>'
-    html_content += '<ol>'
-    # Loop correctly over the dictionary items
-    for item, qty in product_data.items():
-        html_content += f'<li>{frappe.utils.escape_html(item)} - {qty}</li>' # Escape HTML for safety
-    html_content += '</ol>'
+    html_content = """"
+    
+    """
+    # html_content += '<ol>'
+    # # Loop correctly over the dictionary items
+    # for item, qty in product_data.items():
+    #     html_content += f'<li>{frappe.utils.escape_html(item)} - {qty}</li>' # Escape HTML for safety
+    # html_content += '</ol>'
 
     # Generate PDF
     pdf_bytes = get_pdf(html_content, options={
@@ -126,13 +129,13 @@ def get_events(ticket_id=None):
 # Add new events
 ##############################
 @frappe.whitelist(allow_guest=False) 
-def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, date=None, description=None):  
-    print(ticket_id, event_type_name, duration, date,description)      
+def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, date=None, description=None):      
+    print(f"******************{duration}********************")    
     if not all([ticket_id, event_type_name, duration, date,description]):
         frappe.throw("Ticket ID, Event Type, Duration, and Date are required.")
 
-    if not isinstance(duration, (int, float)) or duration <= 0:
-        frappe.throw("Duration must be a positive number.")
+    # if not isinstance(duration, (int, float)) or duration <= 0:
+    #     frappe.throw("Duration must be a positive number.")
 
     try:
         current_user = frappe.session.user
@@ -145,7 +148,7 @@ def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, da
         doc.tts_agent = full_name
         doc.tts_ticket_id = ticket_id
         doc.tts_event_type = event_type_name 
-        doc.tts_event_duration = float(duration)
+        doc.tts_event_duration = duration
         doc.tts_event_date = date
         doc.tts_event_description = description    
         doc.insert()
@@ -163,32 +166,28 @@ def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, da
 # Delete event
 ##############################
 @frappe.whitelist(allow_guest=False)
-def delete_time_sheet_entry(entry_id):
-    print(entry_id)
+def delete_time_sheet_entry(tts_id):
+    print(tts_id)
     # return "ok"
-    if not entry_id:
+    if not tts_id:
         frappe.throw("Entry ID is required to delete a time sheet record.")
 
     try:
-        # Check if the document exists before attempting to delete
-        if not frappe.db.exists("HD Ticket Time Sheet Events", entry_id):
-            frappe.throw(f"Time Sheet Entry with ID '{entry_id}' not found.")
-
-        # Delete the document
-        frappe.delete_doc("HD Ticket Time Sheet Events", entry_id)
+        if not frappe.db.exists("HD Ticket Time Sheet Events", tts_id):
+            frappe.throw(f"Time Sheet Entry with ID '{tts_id}' not found.")
+        
+        frappe.delete_doc("HD Ticket Time Sheet Events", tts_id)
         frappe.db.commit()
 
-        frappe.msgprint(f"Time Sheet Entry '{entry_id}' deleted successfully!")
-        return {"message": "Time Sheet Entry deleted successfully!", "deleted_id": entry_id}
+        frappe.msgprint(f"Time Sheet Entry '{tts_id}' deleted successfully!")
+        return {"message": "Time Sheet Entry deleted successfully!", "deleted_id": tts_id}
 
-    except frappe.DoesNotExistError:
-        # This can be caught if frappe.delete_doc tries to delete a non-existent doc,
-        # though the frappe.db.exists check above should prevent it.
-        frappe.log_error(f"Attempted to delete non-existent Time Sheet Entry: {entry_id}", "Delete Time Sheet Entry Error")
-        frappe.throw(f"Time Sheet Entry with ID '{entry_id}' not found or already deleted.")
+    except frappe.DoesNotExistError:        
+        frappe.log_error(f"Attempted to delete non-existent Time Sheet Entry: {tts_id}", "Delete Time Sheet Entry Error")
+        frappe.throw(f"Time Sheet Entry with ID '{tts_id}' not found or already deleted.")
     except Exception as e:
         frappe.db.rollback() # Rollback in case of partial deletion or other issues
-        frappe.log_error(frappe.get_traceback(), f"Failed to delete time sheet entry: {entry_id}")
+        frappe.log_error(frappe.get_traceback(), f"Failed to delete time sheet entry: {tts_id}")
         frappe.throw(f"Failed to delete time sheet entry: {e}")
 
 

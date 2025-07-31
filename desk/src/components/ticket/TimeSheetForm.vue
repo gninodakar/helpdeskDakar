@@ -3,15 +3,24 @@
     <h3 class="text-lg font-semibold mb-4 text-gray-800">
       Add Time Sheet Entry
     </h3>
-    <div class="flex justify-start mb-4">
-      <button
-        class="rounded bg-teal-500 px-3 py-1.5 text-base text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-        @click="sendTicketpdf"
-        title="Email Ticket as PDF"
+    <div class="flex justify-start mb-4 items-center gap-2">
+      <label
+        for="reportActions"
+        class="text-sm font-medium text-gray-700 sr-only"
+        >Report Actions</label
       >
-        Email Ticket PDF
-      </button>
+      <select
+        id="reportActions"
+        v-model="selectedReportAction"
+        @change="executeReportAction"
+        class="block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      >
+        <option value="">Select Report Action</option>
+        <option value="email">Email Ticket PDF</option>
+        <option value="download">Download Report PDF</option>
+      </select>
     </div>
+
     <div class="flex justify-start mb-4"></div>
     <form
       @submit.prevent="addTimeSheetRow"
@@ -44,15 +53,15 @@
         <label
           for="duration"
           class="block text-sm font-medium text-gray-700 mb-1"
-          >Duration (hours)</label
+          >Duration (HH:mm)</label
         >
         <input
-          type="number"
+          type="time"
           id="duration"
-          v-model.number="form.duration"
-          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          min="0.1"
-          step="0.1"
+          data-fieldtype="Time"
+          data-fieldname="duration"
+          v-model="form.durationTime"
+          class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           required
         />
       </div>
@@ -221,7 +230,7 @@ const emit = defineEmits(["row-added"]);
 
 const form = reactive({
   type_event: "",
-  duration: null,
+  durationTime: null,
   date: new Date().toISOString().split("T")[0],
   hd_event_description: "",
 });
@@ -240,48 +249,33 @@ const totalDuration = computed(() => {
     .toFixed(1);
 });
 
+const selectedReportAction = ref("");
+
+const executeReportAction = () => {
+  if (selectedReportAction.value === "email") {
+    sendTicketpdf();
+  } else if (selectedReportAction.value === "download") {
+    downloadpdf();
+  }
+  //reset action
+  selectedReportAction.value = "";
+};
+
 /* ******************************** */
 // send pdf data
 /* ******************************** */
-// const sendTicketpdf = async () => {
-//   console.log("Ticket ID:", props.ticketId);
-//   try {
-//     await call("helpdesk.api.ticket_time_sheet.send_report_pdf", {
-//       ticket_id: props.ticketId,
-//     });
-
-//     toast.success("Time sheet entry added successfully!");
-//   } catch (error) {
-//     console.error("Error adding time sheet entry:", error);
-//     const errorMessage = error.messages
-//       ? error.messages.join(", ")
-//       : error.message || "Unknown error";
-//     toast.error("Failed to add time sheet entry: " + errorMessage);
-//   } finally {
-//     isLoading.value = false;
-//   }
-// };
-
-const ticket = {
-  data: {
-    name: "TICKET-007",
-    subject: "My Sample Ticket",
-    raised_by: "ganpforrest@gmail.com",
-  },
-}; // Dummy for example
-
-const sendTicketpdf = async () => {  
-  const recipients = ["guillermo@albanss.com"]; 
+const sendTicketpdf = async () => {
+  const recipients = ["guillermo@albanss.com"];
   const pdfTitle = "My Personalised Notes";
   const customText = "This is a proof text for the PDF.";
-  const senderEmail = "ganpforrest@gmail.com"; 
+  const senderEmail = "ganpforrest@gmail.com";
 
   try {
     await call("helpdesk.api.ticket_time_sheet.send_report_pdf", {
       recipients: recipients,
       pdf_title: pdfTitle,
       pdf_text_content: customText,
-      sender_email_address: senderEmail, 
+      sender_email_address: senderEmail,
     });
 
     toast.success("Email with personalised PDF successfully sent.");
@@ -291,6 +285,38 @@ const sendTicketpdf = async () => {
       ? error.messages.join(", ")
       : error.message || "Unknown error";
     toast.error("Error when sending mail with PDF: " + errorMessage);
+  }
+};
+
+/* ******************************** */
+// download pdf data
+/* ******************************** */
+const downloadpdf = async () => {
+  try {
+    // Replace with your actual Frappe API call for downloading PDF
+    // This example assumes it returns a file URL or triggers a download
+    const response = await call(
+      "helpdesk.api.ticket_time_sheet.download_report_pdf",
+      {
+        ticket_id: props.ticketId, // Pass any necessary parameters
+      }
+    );
+
+    // Example if the API returns a downloadable URL:
+    if (response && response.file_url) {
+      window.open(response.file_url, "_blank");
+      toast.success("PDF download initiated!");
+    } else {
+      toast.info(
+        "Download request sent. Check your browser's download manager."
+      );
+    }
+  } catch (error) {
+    console.error("Error downloading PDF:", error);
+    const errorMessage = error.messages
+      ? error.messages.join(", ")
+      : error.message || "Unknown error";
+    toast.error("Failed to download PDF: " + errorMessage);
   }
 };
 
@@ -329,7 +355,7 @@ const fetchTimeSheet = createResource({
   makeParams: () => ({
     ticket_id: props.ticketId,
   }),
-  onSuccess: (data) => {    
+  onSuccess: (data) => {
     if (!Array.isArray(data) || data.length === 0) {
       console.warn("API returned no time sheet entries");
       timeSheetEntries.value = dummyTimeSheetEntries;
@@ -365,9 +391,9 @@ const fetchTimeSheet = createResource({
 const addTimeSheetRow = async () => {
   if (
     !form.type_event ||
-    form.duration === null ||
-    form.duration <= 0 ||
-    !form.date
+    !form.durationTime ||
+    !form.date ||
+    !form.hd_event_description
   ) {
     toast.error(
       "Please fill in all required fields correctly (Duration must be mayor 0)."
@@ -383,7 +409,7 @@ const addTimeSheetRow = async () => {
     await call("helpdesk.api.ticket_time_sheet.add_time_sheet_entry", {
       ticket_id: props.ticketId,
       event_type_name: form.type_event,
-      duration: form.duration,
+      duration: form.durationTime,
       date: dateToSend,
       description: form.hd_event_description,
     });
@@ -391,7 +417,7 @@ const addTimeSheetRow = async () => {
     toast.success("Time sheet entry added successfully!");
     // Clear the form
     form.type_event = "";
-    form.duration = null;
+    form.durationTime = null;
     form.hd_event_description = "";
     form.date = new Date().toISOString().split("T")[0]; // Reset date to today
 
@@ -440,7 +466,7 @@ const deleteTimeSheetEntry = async (entry: any) => {
     }
 
     await call("helpdesk.api.ticket_time_sheet.delete_time_sheet_entry", {
-      entry_id: entry.id,
+      tts_id: entry.id,
     });
     toast.success("Time sheet entry deleted successfully!");
     fetchTimeSheet.reload();
@@ -460,30 +486,31 @@ onMounted(() => {
 });
 </script>
 
+<!-- ************************* 
+ styles 
+<!-- ************************ -->
 <style scoped>
-/********************************/
-/* styles                         */
-/********************************/
-.time-sheet-form {
-  /* padding, border, bg-white, shadow-sm are kept from your original */
-}
-
 /* Basic styling for the form elements */
 label {
   display: block;
-  margin-bottom: 0.25rem; /* Tailwind: mb-1 */
+  margin-bottom: 0.25rem;
 }
 
 input[type="text"],
 input[type="number"],
 input[type="date"],
 select {
-  padding: 0.5rem 0.75rem; /* Tailwind: px-3 py-2 */
+  padding: 0.5rem 0.75rem;
   border-width: 1px;
-  border-color: #d1d5db; /* Tailwind: border-gray-300 */
-  border-radius: 0.375rem; /* Tailwind: rounded-md */
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Tailwind: shadow-sm */
+  border-color: #d1d5db;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   width: 100%;
+}
+
+.custom-select-width {
+  width: auto;
+  min-width: 150px;
 }
 
 input:focus,
@@ -491,8 +518,8 @@ select:focus,
 textarea:focus {
   outline: none;
   ring-width: 2px;
-  ring-color: #3b82f6; /* Tailwind: focus:ring-blue-500 */
-  border-color: #3b82f6; /* Tailwind: focus:border-blue-500 */
+  ring-color: #3b82f6;
+  border-color: #3b82f6;
 }
 
 /* Table specific styling - Tailwind classes are quite verbose, but effective */
@@ -503,24 +530,24 @@ table {
 
 th,
 td {
-  padding: 0.75rem 1.5rem; /* Tailwind: px-6 py-4 for td, px-6 py-3 for th */
+  padding: 0.5rem 1.5rem;
   text-align: left;
 }
 
 thead th {
-  background-color: #f9fafb; /* Tailwind: bg-gray-50 */
+  background-color: #f9fafb;
   border-bottom-width: 1px;
-  border-color: #e5e7eb; /* Tailwind: border-gray-200 */
-  font-size: 0.75rem; /* Tailwind: text-xs */
-  font-weight: 500; /* Tailwind: font-medium */
-  color: #6b7280; /* Tailwind: text-gray-500 */
+  border-color: #e5e7eb;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: 0.05em; /* Tailwind: tracking-wider */
+  letter-spacing: 0.05em;
 }
 
 tbody td {
   border-bottom-width: 1px;
-  border-color: #e5e7eb; /* Tailwind: divide-y divide-gray-200 on tbody parent */
+  border-color: #e5e7eb;
 }
 
 tbody tr:last-child td {
