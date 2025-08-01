@@ -54,12 +54,13 @@
           >Duration (HH:mm)</label
         >
         <input
-          type="time"
+          type="text"
           id="duration"
-          data-fieldtype="Time"
-          data-fieldname="duration"
           v-model="form.durationTime"
+          @input="formatTimeInput"
           class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="00:00"
+          maxlength="5"
           required
         />
       </div>
@@ -216,6 +217,24 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from "vue";
 import { call, toast, createResource, dayjs } from "frappe-ui";
+
+// Function to format time input as HH:mm
+const formatTimeInput = (event) => {
+  let value = event.target.value.replace(/[^0-9]/g, "");
+
+  if (value.length === 3) {
+    value = "0" + value;
+  }
+
+  if (value.length > 4) {
+    value = value.slice(0, 4);
+  }
+
+  if (value.length > 2) {
+    value = value.slice(0, 2) + ":" + value.slice(2, 4);
+  }
+  form.durationTime = value;
+};
 
 const props = defineProps({
   ticketId: {
