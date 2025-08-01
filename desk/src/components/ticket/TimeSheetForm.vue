@@ -3,24 +3,22 @@
     <h3 class="text-lg font-semibold mb-4 text-gray-800">
       Add Time Sheet Entry
     </h3>
-    <div class="flex justify-start mb-4 items-center gap-2">
-      <label
-        for="reportActions"
-        class="text-sm font-medium text-gray-700 sr-only"
-        >Report Actions</label
+    <div class="flex flex-col sm:flex-row justify-start mb-4 gap-2">
+      <button
+        class="rounded bg-teal-500 px-3 py-1.5 text-base font-medium text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+        @click="sendmailpdf"
+        title="Email Ticket as PDF"
       >
-      <select
-        id="reportActions"
-        v-model="selectedReportAction"
-        @change="executeReportAction"
-        class="block px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        Email Time Sheet
+      </button>
+      <button
+        class="rounded bg-amber-600 px-3 py-1.5 text-base font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
+        @click="downloadPdfDirect"
+        title="Download Report"
       >
-        <option value="">Select Report Action</option>
-        <option value="email">Email Ticket PDF</option>
-        <option value="download">Download Report PDF</option>
-      </select>
+        Download Time Sheet
+      </button>
     </div>
-
     <div class="flex justify-start mb-4"></div>
     <form
       @submit.prevent="addTimeSheetRow"
@@ -227,7 +225,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["row-added"]);
-
 const form = reactive({
   type_event: "",
   durationTime: null,
@@ -237,34 +234,57 @@ const form = reactive({
 
 const isLoading = ref(false);
 const timeSheetEntries = ref<any[]>([]);
+const totalDuration = ref("00:00");
 
 // dummy data for testing
 const dummyTimeSheetEntries = [];
 
-const totalDuration = computed(() => {
-  return timeSheetEntries.value
-    .reduce((sum, entry) => {
-      return sum + (typeof entry.duration === "number" ? entry.duration : 0);
-    }, 0)
-    .toFixed(1);
-});
+/* ******************************** */
+// donwload pdf
+/* ******************************** */
+const downloadPdfDirect = async () => {
+  try {
+    // Show loading toast
+    // toast.promise(
+    //   new Promise((resolve) => setTimeout(resolve, 1000)), // Simulate loading
+    //   {
+    //     loading: "Generating PDF report...",
+    //     success: "PDF download started!",
+    //     error: "Failed to generate PDF",
+    //   }
+    // );
 
-const selectedReportAction = ref("");
+    const functionPath = "helpdesk.api.ticket_time_sheet.download_report_pdf";
+    const params = new URLSearchParams({
+      ticket_id: props.ticketId,
+    });
 
-const executeReportAction = () => {
-  if (selectedReportAction.value === "email") {
-    sendTicketpdf();
-  } else if (selectedReportAction.value === "download") {
-    downloadpdf();
+    const url = `/api/method/${functionPath}?${params.toString()}`;
+
+    // Create temporary link and trigger download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `timesheet-report-${props.ticketId || "report"}-${
+      new Date().toISOString().split("T")[0]
+    }.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Show success toast
+    toast.success("PDF report download started successfully!");
+  } catch (error) {
+    console.error("PDF download failed:", error);
+    toast.error(
+      "Failed to download PDF report: " + (error.message || "Unknown error")
+    );
   }
-  //reset action
-  selectedReportAction.value = "";
 };
 
 /* ******************************** */
-// send pdf data
+// send email pdf data
 /* ******************************** */
-const sendTicketpdf = async () => {
+const sendmailpdf = async () => {
   const recipients = ["guillermo@albanss.com"];
   const pdfTitle = "My Personalised Notes";
   const customText = "This is a proof text for the PDF.";
@@ -272,6 +292,7 @@ const sendTicketpdf = async () => {
 
   try {
     await call("helpdesk.api.ticket_time_sheet.send_report_pdf", {
+      ticket_id: props.ticketId,
       recipients: recipients,
       pdf_title: pdfTitle,
       pdf_text_content: customText,
@@ -285,38 +306,6 @@ const sendTicketpdf = async () => {
       ? error.messages.join(", ")
       : error.message || "Unknown error";
     toast.error("Error when sending mail with PDF: " + errorMessage);
-  }
-};
-
-/* ******************************** */
-// download pdf data
-/* ******************************** */
-const downloadpdf = async () => {
-  try {
-    // Replace with your actual Frappe API call for downloading PDF
-    // This example assumes it returns a file URL or triggers a download
-    const response = await call(
-      "helpdesk.api.ticket_time_sheet.download_report_pdf",
-      {
-        ticket_id: props.ticketId, // Pass any necessary parameters
-      }
-    );
-
-    // Example if the API returns a downloadable URL:
-    if (response && response.file_url) {
-      window.open(response.file_url, "_blank");
-      toast.success("PDF download initiated!");
-    } else {
-      toast.info(
-        "Download request sent. Check your browser's download manager."
-      );
-    }
-  } catch (error) {
-    console.error("Error downloading PDF:", error);
-    const errorMessage = error.messages
-      ? error.messages.join(", ")
-      : error.message || "Unknown error";
-    toast.error("Failed to download PDF: " + errorMessage);
   }
 };
 
@@ -356,11 +345,12 @@ const fetchTimeSheet = createResource({
     ticket_id: props.ticketId,
   }),
   onSuccess: (data) => {
-    if (!Array.isArray(data) || data.length === 0) {
+    console.log("here the data", data);
+    if (!Array.isArray(data.events) || data.length === 0) {
       console.warn("API returned no time sheet entries");
       timeSheetEntries.value = dummyTimeSheetEntries;
     } else {
-      timeSheetEntries.value = data.map((entry) => ({
+      timeSheetEntries.value = data.events.map((entry) => ({
         id: entry.tts_id,
         agent: entry.tts_agent,
         type_event: entry.tts_event_type,
@@ -368,6 +358,13 @@ const fetchTimeSheet = createResource({
         date: entry.tts_event_date,
         hd_event_description: entry.tts_event_description,
       }));
+    }
+
+    //udpate time spent label
+    if (data.total_time_spent !== undefined) {
+      totalDuration.value = data.total_time_spent;
+    } else {
+      totalDuration.value = "00:00";
     }
   },
   onError: (error) => {
@@ -419,7 +416,7 @@ const addTimeSheetRow = async () => {
     form.type_event = "";
     form.durationTime = null;
     form.hd_event_description = "";
-    form.date = new Date().toISOString().split("T")[0]; // Reset date to today
+    form.date = new Date().toISOString().split("T")[0];
 
     emit("row-added");
     fetchTimeSheet.reload(); // Reload the list of entries
@@ -443,8 +440,6 @@ const deleteTimeSheetEntry = async (entry: any) => {
     toast.error("Cannot delete entry: Missing ID.");
     return;
   }
-
-  // IMPORTANT: Use new fieldname for confirm message
   if (
     !confirm(
       `Are you sure you want to delete the entry ID: "${entry.id}" on ${entry.date}?`
@@ -506,11 +501,6 @@ select {
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   width: 100%;
-}
-
-.custom-select-width {
-  width: auto;
-  min-width: 150px;
 }
 
 input:focus,

@@ -1,176 +1,226 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dakar Employee List - CMD</title>
+    <meta charset="utf-8" />
+    <title>Report</title>
     <style>
-      /* General styles */
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: white;
-        position: relative;
+         {
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: white;
+          position: relative;
+        }
       }
 
       /* Letter size simulation */
       .letter-container {
-        width: 8.5in;
-        min-height: 11in;
-        margin: 20px auto;
-        background-color: white;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        position: relative;
-        padding: 0.5in;
-        box-sizing: border-box;
+         {
+          width: 100%;
+          height: 1220px;
+          margin: 0 auto;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          position: relative;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+        }
       }
 
       /* Header styles */
       .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 20px;
+         {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 20px;
+        }
       }
 
       .logo {
-        width: 150px;
+         {
+          width: 250px;
+          margin-bottom: 20px;
+        }
       }
 
       .address {
-        text-align: right;
-        font-size: 12px;
-        line-height: 1.3;
+         {
+          text-align: right;
+          font-size: 12px;
+          line-height: 1.3;
+        }
       }
 
       /* Main content styles */
       h1 {
-        color: #0a0a0a;
-        margin-top: 0;
-        font-size: 16px;
+         {
+          color: #0a0a0a;
+          margin-top: 0;
+          font-size: 16px;
+        }
       }
 
       h2 {
-        color: #5b72a0;
-        margin-top: 10px;
-        font-size: 25px;
+         {
+          color: #5b72a0;
+          margin-top: 10px;
+          font-size: 25px;
+        }
       }
 
       p {
-        font-size: 12px;
-        margin: 5px 0;
+         {
+          font-size: 12px;
+          margin: 5px 0;
+        }
       }
 
       /* Modern table styles with rounded corners */
       table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin: 15px 0;
-        font-size: 11px;
-        border-radius: 5px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+         {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 1;
+          margin: 15px 0;
+          font-size: 11px;
+          border-radius: 5px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
       }
 
       th {
-        background: rgb(195, 200, 204);
-        color: rgb(26, 25, 25);
-        padding: 12px 8px;
-        text-align: left;
-        font-weight: 600;
-        font-size: 11px;
+         {
+          background: rgb(195, 200, 204);
+          color: rgb(26, 25, 25);
+          padding: 12px 8px;
+          text-align: left;
+          font-weight: 600;
+          font-size: 11px;
+        }
       }
 
       td {
-        padding: 10px 8px;
-        border-bottom: 1px solid #c2bcbc;
-        text-align: left;
+         {
+          padding: 10px 8px;
+          border-bottom: 1px solid #c2bcbc;
+          text-align: left;
+        }
       }
 
       tr:last-child td {
-        border-bottom: none;
+         {
+          border-bottom: none;
+        }
       }
 
       tr:nth-child(even) {
-        background-color: #f8f9fa;
+         {
+          background-color: #f8f9fa;
+        }
       }
 
       tr:hover {
-        background-color: #e3f2fd;
-        transition: background-color 0.2s ease;
+         {
+          background-color: #e3f2fd;
+          transition: background-color 0.2s ease;
+        }
       }
 
       /* Rounded corners for table */
       th:first-child {
-        border-top-left-radius: 5px;
+         {
+          border-top-left-radius: 5px;
+        }
       }
 
       th:last-child {
-        border-top-right-radius: 5px;
+         {
+          border-top-right-radius: 5px;
+        }
       }
 
       tr:last-child td:first-child {
-        border-bottom-left-radius: 5px;
+         {
+          border-bottom-left-radius: 5px;
+        }
       }
 
       tr:last-child td:last-child {
-        border-bottom-right-radius: 5px;
+         {
+          border-bottom-right-radius: 5px;
+        }
       }
 
       /* Two-column footer styles */
       .footer-container {
-        position: absolute;
-        bottom: 0.5in;
-        left: 0.5in;
-        right: 0.5in;
-        border-top: 1px solid #a9aeb4;
-        padding-top: 8px;
-        font-size: 11px;
-        color: #626568;
+         {
+          width: 100%;
+          position: absolute;
+          bottom: 0in;
+          border-top: 1px solid #a9aeb4;
+          padding-top: 8px;
+          font-size: 11px;
+          color: #626568;
+        }
       }
 
       .footer-columns {
-        display: flex;
-        justify-content: space-between;
+         {
+          display: flex;
+          justify-content: space-between;
+        }
       }
 
       .footer-column {
-        flex: 1;
+         {
+          flex: 1;
+        }
       }
 
       .footer-column:first-child {
-        text-align: left;
+         {
+          text-align: left;
+        }
       }
 
       .footer-column:last-child {
-        text-align: right;
+         {
+          text-align: right;
+        }
       }
 
       .footer-item {
-        margin: 2px 0;
+         {
+          margin: 2px 0;
+        }
       }
 
       /* Watermark styles */
       .watermark {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
-        background-image: url("https://pshr.gov.mt/login_portal/images/logo.png");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain;
-        opacity: 0.15;
+         {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: -1; /* Behind content */
+          pointer-events: none; /* Doesn't interfere with clicks */
+          background-image: url("{logo_url}");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 600px auto;
+          opacity: 0.1; /* Make it subtle but visible */
+        }
       }
 
       /* Ensure content doesn't overlap with footer */
       .content {
-        margin-bottom: 100px;
+         {
+          margin-bottom: 50px;
+        }
       }
     </style>
   </head>
@@ -181,11 +231,7 @@
 
       <!-- Header -->
       <div class="header">
-        <img
-          src="https://pshr.gov.mt/login_portal/images/logo.png"
-          alt="Dakar Logo"
-          class="logo"
-        />
+        <img src="{logo_url}" alt="Dakar Logo" class="logo" />
         <div class="address">
           Dakar Software Systems<br />
           Level 4 Dakar Buildings<br />
@@ -230,6 +276,14 @@
               <td>Assisting with employee removal</td>
               <td>03:00</td>
             </tr>
+            <tr>
+              <td>21/04/2025</td>
+              <td>Eugene Debono</td>
+              <td>Meeting</td>
+              <td>Investigated issue and communicated with client</td>
+              <td>01:30</td>
+            </tr>
+            <tr></tr>
             <tr>
               <td>21/04/2025</td>
               <td>Eugene Debono</td>
