@@ -191,13 +191,10 @@
 
       <!-- Main Content -->
       <div class="content">
-        <h1>Ticket:[{{ticket_id}}] Dakar employee list - CMD</h1>
+        <h1>Ticket:[{{ticket_id}}] {{ticket_subject}}</h1>
         <h2>Timesheets</h2>
 
-        <p>
-          <strong>CUSTOMER:</strong> Cleansing & Maintenance Division, Patrick
-          Briffa
-        </p>
+        <p><strong>CUSTOMER: {{customer_name}} </strong></p>
 
         <table>
           <thead>
@@ -210,40 +207,27 @@
             </tr>
           </thead>
           <tbody>
+            {% for entry in timesheet_entries %}
             <tr>
-              <td>21/04/2025</td>
-              <td>Miguel Fenech</td>
-              <td>Meeting</td>
-              <td>Deletion of selective employees. Analysis & Selection.</td>
-              <td>01:00</td>
+              <td>{{ entry.tts_event_date }}</td>
+              <td>{{ entry.tts_agent }}</td>
+              <td>{{ entry.tts_event_type }}</td>
+              <td>{{ entry.tts_event_description }}</td>
+              <td>{{ entry.tts_event_duration }}</td>
             </tr>
+            {% else %}
             <tr>
-              <td>21/04/2025</td>
-              <td>Eugene Debono</td>
-              <td>Meeting</td>
-              <td>Assisting with employee removal</td>
-              <td>03:00</td>
+              <td colspan="5" class="text-center">
+                No time sheet entries found
+              </td>
             </tr>
-            <tr>
-              <td>21/04/2025</td>
-              <td>Eugene Debono</td>
-              <td>Meeting</td>
-              <td>Investigated issue and communicated with client</td>
-              <td>01:30</td>
-            </tr>
-            <tr></tr>
-            <tr>
-              <td>21/04/2025</td>
-              <td>Eugene Debono</td>
-              <td>Meeting</td>
-              <td>Investigated issue and communicated with client</td>
-              <td>01:30</td>
-            </tr>
+            {% endfor %}
+
             <tr>
               <td colspan="4" style="text-align: right">
                 <strong>Total (Hours)</strong>
               </td>
-              <td><strong>05:30</strong></td>
+              <td><strong>{{total_time_spent |default('00:00')}}</strong></td>
             </tr>
           </tbody>
         </table>

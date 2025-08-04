@@ -53,16 +53,44 @@
           class="block text-sm font-medium text-gray-700 mb-1"
           >Duration (HH:mm)</label
         >
-        <input
-          type="text"
-          id="duration"
-          v-model="form.durationTime"
-          @input="formatTimeInput"
-          class="form-control block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          placeholder="00:00"
-          maxlength="5"
-          required
-        />
+        <div class="relative">
+          <input
+            type="text"
+            id="duration"
+            v-model="form.durationTime"
+            @input="formatTimeInput"
+            @blur="
+              () => {
+                if (form.durationTime && !validateTime(form.durationTime))
+                  toast.error('Invalid time: hours 0-99, minutes 0-59');
+              }
+            "
+            class="form-control block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            placeholder="00:00"
+            maxlength="5"
+            required
+          />
+          <button
+            v-if="form.durationTime"
+            type="button"
+            @click="clearDuration"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+          >
+            <svg
+              class="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="flex-grow min-w-[150px]">
@@ -215,15 +243,81 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, nextTick } from "vue";
 import { call, toast, createResource, dayjs } from "frappe-ui";
+
+// dummy data for testing
+const dummyTimeSheetEntries = [];
+
+///
+const validateAndCorrectTime = (timeString: string): string => {
+  if (!timeString) {
+    return "";
+  }
+
+  // If it's already in HH:mm format, validate and correct
+  if (timeString.length === 5 && timeString[2] === ":") {
+    const [hours, minutes] = timeString.split(":");
+    const hoursNum = parseInt(hours, 10);
+    const minutesNum = parseInt(minutes, 10);
+
+    if (!isNaN(hoursNum) && !isNaN(minutesNum)) {
+      // Validate hours (0-99)
+      const correctedHours = Math.max(0, Math.min(99, hoursNum));
+
+      // Correct minutes if over 59
+      const correctedMinutes = Math.min(59, Math.max(0, minutesNum));
+
+      // Format with leading zeros
+      return `${correctedHours.toString().padStart(2, "0")}:${correctedMinutes
+        .toString()
+        .padStart(2, "0")}`;
+    }
+  }
+
+  return timeString;
+};
+
+const validateTime = (timeString: string): boolean => {
+  if (!timeString || timeString.length !== 5 || timeString[2] !== ":") {
+    return false;
+  }
+
+  const [hours, minutes] = timeString.split(":");
+  const hoursNum = parseInt(hours, 10);
+  const minutesNum = parseInt(minutes, 10);
+
+  // Validate hours (0-99) and minutes (0-59)
+  return (
+    !isNaN(hoursNum) &&
+    !isNaN(minutesNum) &&
+    hoursNum >= 0 &&
+    hoursNum <= 99 &&
+    minutesNum >= 0 &&
+    minutesNum <= 59
+  );
+};
+
+//
+const clearDuration = (): void => {
+  form.durationTime = "";
+  // Optional: focus the input after clearing
+  nextTick(() => {
+    const durationInput = document.getElementById("duration");
+    if (durationInput) {
+      durationInput.focus();
+    }
+  });
+};
 
 // Function to format time input as HH:mm
 const formatTimeInput = (event) => {
   let value = event.target.value.replace(/[^0-9]/g, "");
 
-  if (value.length === 3) {
-    value = "0" + value;
+  // Allow empty value (for clearing)
+  if (value.length === 0) {
+    form.durationTime = "";
+    return;
   }
 
   if (value.length > 4) {
@@ -232,10 +326,14 @@ const formatTimeInput = (event) => {
 
   if (value.length > 2) {
     value = value.slice(0, 2) + ":" + value.slice(2, 4);
+    // Auto-correct if minutes are over 59
+    value = validateAndCorrectTime(value);
   }
+
   form.durationTime = value;
 };
 
+//props
 const props = defineProps({
   ticketId: {
     type: String,
@@ -243,6 +341,7 @@ const props = defineProps({
   },
 });
 
+//emit
 const emit = defineEmits(["row-added"]);
 const form = reactive({
   type_event: "",
@@ -255,24 +354,11 @@ const isLoading = ref(false);
 const timeSheetEntries = ref<any[]>([]);
 const totalDuration = ref("00:00");
 
-// dummy data for testing
-const dummyTimeSheetEntries = [];
-
 /* ******************************** */
 // donwload pdf
 /* ******************************** */
 const downloadPdfDirect = async () => {
   try {
-    // Show loading toast
-    // toast.promise(
-    //   new Promise((resolve) => setTimeout(resolve, 1000)), // Simulate loading
-    //   {
-    //     loading: "Generating PDF report...",
-    //     success: "PDF download started!",
-    //     error: "Failed to generate PDF",
-    //   }
-    // );
-
     const functionPath = "helpdesk.api.ticket_time_sheet.download_report_pdf";
     const params = new URLSearchParams({
       ticket_id: props.ticketId,

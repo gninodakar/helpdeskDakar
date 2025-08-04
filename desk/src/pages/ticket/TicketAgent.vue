@@ -53,12 +53,12 @@
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col max-w-[calc(100%-382px)]">
-         <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
+        <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
           <Tabs v-model="tabIndex" :tabs="tabs">
             <TabList />
             <TabPanel v-slot="{ tab }" class="h-full">
               <TicketAgentActivities
-                v-if="tab.name !== 'time-sheet'"
+                v-if="tab.name !== 'timeSheet'"
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
@@ -74,14 +74,20 @@
                   }
                 "
               />
-              <div v-else-if="tab.name === 'time-sheet'" class="p-4 h-full overflow-y-auto">
-                <TimeSheetForm :ticket-id="ticket.data.name" @row-added="ticket.reload()" />
+              <div
+                v-else-if="tab.name === 'timeSheet'"
+                class="p-4 h-full overflow-y-auto"
+              >
+                <TimeSheetForm
+                  :ticket-id="ticket.data.name"
+                  @row-added="ticket.reload()"
+                />
               </div>
             </TabPanel>
           </Tabs>
         </div>
         <CommunicationArea
-          v-if="tabs[tabIndex].name !== 'time-sheet'"
+          v-if="tabs[tabIndex].name !== 'timeSheet'"
           ref="communicationAreaRef"
           v-model="ticket.data"
           :to-emails="[ticket.data?.raised_by]"
@@ -178,6 +184,7 @@ import { TabObject, TicketTab, View } from "@/types";
 import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
+import TimeSheetIcon from "@/components/icons/timeSheetIcon.vue";
 const route = useRoute();
 const router = useRouter();
 
@@ -312,9 +319,9 @@ const tabs: TabObject[] = [
   },
 
   {
-    name: "time-sheet",
+    name: "timeSheet",
     label: "Time Sheet",
-    icon: CommentIcon,
+    icon: TimeSheetIcon,
   },
 ];
 

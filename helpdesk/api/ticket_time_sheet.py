@@ -1,7 +1,7 @@
 import frappe 
 from frappe import _
 from frappe.utils.pdf import get_pdf 
-from frappe.utils import now_datetime, get_url
+from frappe.utils import now_datetime
 
 
 
@@ -28,9 +28,9 @@ def get_event_type_names():
         frappe.log_error(frappe.get_traceback(), "Failed to fetch event type names")
         return [] 
     
-##############################
-# send ticket by pdf
-##############################
+##################################
+# send ticket time sheet to pdf
+##################################
 @frappe.whitelist(allow_guest=False)
 def send_report_pdf(ticket_id=None):  
     print(ticket_id)  
@@ -38,24 +38,28 @@ def send_report_pdf(ticket_id=None):
     image_path = f"/assets/helpdesk/images/logo.png"              
     logo_url = f"http://127.0.0.1:8000{image_path}"
 
-    # vars to render the template
+    tts = get_events(ticket_id)        
+    ticket_subject = frappe.db.get_value("HD Ticket", ticket_id, "subject") 
+    customer_name = frappe.db.get_value("HD Ticket", ticket_id, "customer")   
+
     context = {
         'logo_url': logo_url,
-        'ticket_id': ticket_id,     
+        'ticket_id': ticket_id,
+        "ticket_subject" : ticket_subject,
+        "customer_name": customer_name,
+        "timesheet_entries": tts["events"],
+        "total_time_spent": tts["total_time_spent"]
     }
 
     html_content = frappe.render_template('helpdesk/templates/pdf/ticket_time_sheet_report.html', context)
-
+    
     message = """
     <p>Dear Customer,</p>
     <p>Attached is the report for your consideration.</p>        
-    <p>Best regards,</p>
-    
+    <p>Best regards,</p>        
     <p>
-
     <p>Dakar Software Team</p>
     """
-
 
     # Generate PDF
     pdf_bytes = get_pdf(html_content, options={
@@ -71,8 +75,9 @@ def send_report_pdf(ticket_id=None):
     try:
         frappe.sendmail(
             recipients=recipients,
-            subject='Invoice from Star Electronics e-Store',
-            message=message, 
+            subject=f'Time Sheet Report Support Ticket {ticket_id}',
+            # message=message, 
+            template="This a demo email template",
             attachments=[{
                 'fname': 'invoice.pdf',
                 'fcontent': pdf_bytes
@@ -97,9 +102,17 @@ def download_report_pdf(ticket_id=None):
     image_path = f"/assets/helpdesk/images/logo.png"              
     logo_url = f"http://127.0.0.1:8000{image_path}"    
 
+    tts = get_events(ticket_id)        
+    ticket_subject = frappe.db.get_value("HD Ticket", ticket_id, "subject") 
+    customer_name = frappe.db.get_value("HD Ticket", ticket_id, "customer")   
+
     context = {
         'logo_url': logo_url,
-        'ticket_id': ticket_id,     
+        'ticket_id': ticket_id,
+        "ticket_subject" : ticket_subject,
+        "customer_name": customer_name,
+        "timesheet_entries": tts["events"],
+        "total_time_spent": tts["total_time_spent"]
     }
 
     html_content = frappe.render_template('helpdesk/templates/pdf/ticket_time_sheet_report.html', context)
@@ -179,9 +192,7 @@ def get_events(ticket_id=None):
             
         } for item in events_list]
 
-        print(formatted_events)
-        print(total_time_spent)
-                
+                        
         return {
             "events": formatted_events,
             "total_time_spent": total_time_spent
@@ -196,13 +207,9 @@ def get_events(ticket_id=None):
 # Add new events
 ##############################
 @frappe.whitelist(allow_guest=False) 
-def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, date=None, description=None):      
-    print(f"******************{duration}********************")    
+def add_time_sheet_entry(ticket_id=None, event_type_name=None, duration=None, date=None, description=None):             
     if not all([ticket_id, event_type_name, duration, date,description]):
-        frappe.throw("Ticket ID, Event Type, Duration, and Date are required.")
-
-    # if not isinstance(duration, (int, float)) or duration <= 0:
-    #     frappe.throw("Duration must be a positive number.")
+        frappe.throw("Ticket ID, Event Type, Duration, and Date are required.")    
 
     try:
         current_user = frappe.session.user
