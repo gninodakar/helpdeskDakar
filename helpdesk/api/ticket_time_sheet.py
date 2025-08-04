@@ -76,8 +76,8 @@ def send_report_pdf(ticket_id=None):
         frappe.sendmail(
             recipients=recipients,
             subject=f'Time Sheet Report Support Ticket {ticket_id}',
-            # message=message, 
-            template="This a demo email template",
+            message=message, 
+            # template="This a demo email template",
             attachments=[{
                 'fname': 'invoice.pdf',
                 'fcontent': pdf_bytes

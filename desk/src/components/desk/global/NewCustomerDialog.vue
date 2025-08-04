@@ -2,10 +2,13 @@
   <div>
     <Dialog
       v-model="model"
-      :options="{ title: 'Add New Customer', size: 'md' }" >
+      :options="{ title: 'Add New Customer', size: 'md' }"
+    >
       <template #body-content>
         <div class="space-y-4">
-          <div class="flex gap-4"> <div class="flex-1 space-y-1"> <Input
+          <div class="flex gap-4">
+            <div class="flex-1 space-y-1">
+              <Input
                 v-model="state.customer"
                 label="Customer Name"
                 type="text"
@@ -35,28 +38,29 @@
                 type="text"
                 placeholder="Email"
               />
+              <Input
+                v-model="state.phone"
+                label="Land Line"
+                type="text"
+                placeholder="Land Line"
+              />
             </div>
 
             <div class="flex-1 space-y-1">
               <Input
-                v-model="state.phone"
-                label="Phone Number"
+                v-model="state.mobile"
+                label="Mobile Number"
                 type="text"
-                placeholder="Phone Number"
+                placeholder="Mobile Number"
               />
+
               <Input
                 v-model="state.hosting_status"
                 label="Hosting Status"
                 type="text"
                 placeholder="Hosting Status"
               />
-              <!-- <Input
-                v-model="state.engagement_date"
-                label="Engagement Date"
-                type="text"
-                placeholder="Engagement Date"
-              /> -->
-               <DatePicker
+              <DatePicker
                 v-model="state.engagement_date"
                 label="Engagement Date"
                 variant="subtle"
@@ -108,6 +112,7 @@ const state = reactive({
   vat: "",
   reg_num: "",
   email: "",
+  mobile: "",
   phone: "",
   hosting_status: "",
   engagement_date: "" as string,
@@ -123,9 +128,10 @@ const customerResource = createResource({
       doctype: "HD Customer",
       customer_name: state.customer,
       customer_address: state.address,
-      vat: state.vat, // Asegúrate de que los nombres de los campos aquí coincidan con los de tu DocType 'HD Customer'
+      vat: state.vat,
       reg_num: state.reg_num,
       email: state.email,
+      mobile: state.mobile,
       phone: state.phone,
       hosting_status: state.hosting_status,
       engagement_date: state.engagement_date,
@@ -134,12 +140,12 @@ const customerResource = createResource({
     },
   },
   onSuccess: () => {
-    // Limpia los campos después de la creación exitosa
     state.customer = "";
     state.address = "";
     state.vat = "";
     state.reg_num = "";
     state.email = "";
+    state.mobile = "";
     state.phone = "";
     state.hosting_status = "";
     state.engagement_date = null;
@@ -163,9 +169,10 @@ function addCustomer() {
       doctype: "HD Customer",
       customer_name: state.customer,
       customer_address: state.address,
-      customer_vat: state.vat, 
+      customer_vat: state.vat,
       customer_reg_num: state.reg_num,
       customer_email: state.email,
+      customer_mobile: state.mobile,
       customer_phone: state.phone,
       customer_hosting_status: state.hosting_status,
       customer_engagement_date: state.engagement_date || null,

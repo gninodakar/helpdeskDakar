@@ -150,7 +150,7 @@
       appName="helpdesk"
       title="Frappe Helpdesk"
       :logo="logo"
-      docsLink="https://docs.frappe.io/helpdesk"
+      docsLink="https://docs.dakarsoftware.com/helpdesk"
       :afterSkip="(step) => capture('onboarding_step_skipped_' + step)"
       :afterSkipAll="() => capture('onboarding_steps_skipped')"
       :afterReset="(step) => capture('onboarding_step_reset_' + step)"
@@ -585,13 +585,13 @@ const articles = ref([
       },
     ],
   },
-  {
-    title: "Frappe Helpdesk Mobile",
-    opened: false,
-    subArticles: [
-      { name: "pwa-installation", title: "Mobile App Installation" },
-    ],
-  },
+  // {
+  //   title: "Frappe Helpdesk Mobile",
+  //   opened: false,
+  //   subArticles: [
+  //     { name: "pwa-installation", title: "Mobile App Installation" },
+  //   ],
+  // },
 ]);
 
 const showIntermediateModal = ref(false);

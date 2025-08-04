@@ -27,16 +27,20 @@ const routes = [
     redirect: "/ticketsnewview",
   },
 
-   {
+  {
     path: "/ticketsnewview",
     name: "TicketNewView",
     component: () => import("@/pages/ticket/TicketsNewView.vue"),
   },
-
   {
     path: "/tickets",
     name: "TicketsAgent",
     component: () => import("@/pages/ticket/Tickets.vue"),
+  },
+  {
+    path: "/unbilled",
+    name: "UnbilledTickets",
+    component: () => import("@/pages/ticket/TicketsUnbilled.vue"),
   },
   {
     path: "/tickets/:ticketId",

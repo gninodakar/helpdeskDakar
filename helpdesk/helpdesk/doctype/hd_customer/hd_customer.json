@@ -14,6 +14,7 @@
   "customer_reg_num",
   "domain",
   "column_break_avai",
+  "customer_mobile",
   "customer_phone",
   "customer_email",
   "customer_hosting_status",
@@ -94,12 +95,17 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Domain"
+  },
+  {
+   "fieldname": "customer_mobile",
+   "fieldtype": "Data",
+   "label": "Mobile"
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-18 13:27:19.048441",
+ "modified": "2025-08-04 16:40:38.162494",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",
