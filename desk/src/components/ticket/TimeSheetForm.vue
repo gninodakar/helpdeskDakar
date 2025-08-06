@@ -28,7 +28,7 @@
         <label
           for="eventType"
           class="block text-sm font-medium text-gray-700 mb-1"
-          >Event</label
+          >Work Type</label
         >
         <select
           id="eventType"
@@ -164,7 +164,7 @@
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Event
+                Work Type
               </th>
               <th
                 scope="col"

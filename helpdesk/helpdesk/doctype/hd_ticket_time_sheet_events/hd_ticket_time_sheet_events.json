@@ -15,8 +15,9 @@
  "fields": [
   {
    "fieldname": "tts_agent",
-   "fieldtype": "Data",
-   "label": "Agent"
+   "fieldtype": "Link",
+   "label": "Agent",
+   "options": "HD Agent"
   },
   {
    "fieldname": "tts_ticket_id",
@@ -51,7 +52,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-31 13:46:04.486087",
+ "modified": "2025-08-06 10:52:00.783294",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Sheet Events",
