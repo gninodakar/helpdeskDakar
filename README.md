@@ -5,7 +5,7 @@
 
 **Customer Service, Made Simple and Effective**
 
-![GitHub release 1.12.0]
+GitHub fork release 1.12.0
 
 </div>
 

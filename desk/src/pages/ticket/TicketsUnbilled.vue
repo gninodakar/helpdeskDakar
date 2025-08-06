@@ -129,7 +129,7 @@
           <select
             v-model="pageSize"
             @change="handlePageSizeChange"
-            class="border rounded px-2 py-1 text-sm"
+            class="border rounded px-2 py-1 text-sm pr-8"
           >
             <option :value="10">10</option>
             <option :value="20">20</option>
@@ -149,7 +149,7 @@
             variant="outline"
             size="sm"
           >
-            «
+            <FeatherIcon name="chevrons-left" class="h-4 w-4" />
           </Button>
           <Button
             @click="goToPreviousPage"
@@ -157,7 +157,7 @@
             variant="outline"
             size="sm"
           >
-            ‹
+            <FeatherIcon name="chevron-left" class="h-4 w-4" />
           </Button>
           <Button
             v-for="page in visiblePages"
@@ -174,7 +174,7 @@
             variant="outline"
             size="sm"
           >
-            ›
+            <FeatherIcon name="chevron-right" class="h-4 w-4" />
           </Button>
           <Button
             @click="goToLastPage"
@@ -182,7 +182,7 @@
             variant="outline"
             size="sm"
           >
-            »
+            <FeatherIcon name="chevrons-right" class="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -192,12 +192,13 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
+import { FeatherIcon } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 
 // Columns definition
 const columns = [
-  { key: "name", label: "ID" },
   { key: "billed", label: "Billed" },
+  { key: "name", label: "ID" },
   { key: "creation", label: "Created" },
   { key: "customer", label: "Customer" },
   { key: "ticket_type", label: "Ticket Type" },
