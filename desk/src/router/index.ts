@@ -38,7 +38,7 @@ const routes = [
     component: () => import("@/pages/ticket/Tickets.vue"),
   },
   {
-    path: "/unbilled",
+    path: "/unbilledtickets",
     name: "UnbilledTickets",
     component: () => import("@/pages/ticket/TicketsUnbilled.vue"),
   },

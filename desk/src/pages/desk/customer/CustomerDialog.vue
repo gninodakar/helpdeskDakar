@@ -34,20 +34,48 @@
         <!-- Two-column form -->
         <form class="w-full" @submit.prevent="update">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <!-- Column 1 -->
-            <Input v-model="customerName" label="Customer Name" placeholder="Customer Name" />
+            <Input
+              v-model="customerName"
+              label="Customer Name"
+              placeholder="Customer Name"
+            />
+            <Input
+              v-model="phoneNumber"
+              label="Phone Number"
+              placeholder="Phone Number"
+            />
             <Input v-model="address" label="Address" placeholder="Address" />
+            <Input
+              v-model="hostingStatus"
+              label="Hosting Status"
+              placeholder="Hosting Status"
+            />
             <Input v-model="vat" label="VAT" placeholder="VAT" />
-            <Input v-model="registrationNumber" label="Registration Number" placeholder="Registration Number" />
+            <DatePicker
+              v-model="engagementDate"
+              label="Engagement Date"
+              variant="subtle"
+              placeholder="Engagement Date"
+              :disabled="false"
+            />
+            <Input
+              v-model="registrationNumber"
+              label="Registration Number"
+              placeholder="Registration Number"
+            />
+            <Input
+              v-model="typeOfClient"
+              label="Type of Client"
+              placeholder="Type of Client"
+            />
             <Input v-model="email" label="Email" placeholder="Email" />
-
-            <!-- Column 2 -->
-            <Input v-model="phoneNumber" label="Phone Number" placeholder="Phone Number" />
-            <Input v-model="hostingStatus" label="Hosting Status" placeholder="Hosting Status" />
-            <DatePicker v-model="engagementDate" label="Engagement Date" variant="subtle" placeholder="Engagement Date" :disabled="false"/>
+            <Input v-model="domain" label="Domain" placeholder="example.com" />
+            <Input
+              v-model="mobile"
+              label="Mobile"
+              placeholder="Mobile Number"
+            />
             <!-- <Input v-model="engagementDate" label="Engagement Date" placeholder="Engagement Date" /> -->
-            <Input v-model="typeOfClient" label="Type of Client" placeholder="Type of Client" />
-            <Input v-model="domain" label="Domain" placeholder="example.com" />                                                                        
           </div>
         </form>
       </div>
@@ -62,7 +90,7 @@ import {
   Dialog,
   FileUploader,
   toast,
-   DatePicker,
+  DatePicker,
 } from "frappe-ui";
 import { computed } from "vue";
 
@@ -78,7 +106,7 @@ const emit = defineEmits(["customer-updated"]);
 const customer = createDocumentResource({
   doctype: "HD Customer",
   name: props.name,
-  fields:[
+  fields: [
     "name",
     "image",
     "customer_name",
@@ -87,6 +115,7 @@ const customer = createDocumentResource({
     "customer_reg_num",
     "customer_email",
     "customer_phone",
+    "customer_mobile",
     "customer_hosting_status",
     "customer_engagement_date",
     "customer_type_of_client",
@@ -133,6 +162,11 @@ const phoneNumber = computed({
   set: (v) => customer.setValue.submit({ customer_phone: v }),
 });
 
+const mobile = computed({
+  get: () => customer.doc?.customer_mobile,
+  set: (v) => customer.setValue.submit({ customer_mobile: v }),
+});
+
 const hostingStatus = computed({
   get: () => customer.doc?.customer_hosting_status,
   set: (v) => customer.setValue.submit({ customer_hosting_status: v }),
@@ -165,7 +199,6 @@ const options = computed(() => ({
   ],
 }));
 
-
 //this function update the fields in frappe
 async function update() {
   await customer.setValue.submit({
@@ -175,6 +208,7 @@ async function update() {
     customer_reg_num: registrationNumber.value,
     customer_email: email.value,
     customer_phone: phoneNumber.value,
+    customer_mobile: mobile.value,
     customer_hosting_status: hostingStatus.value,
     customer_engagement_date: engagementDate.value || null,
     customer_type_of_client: typeOfClient.value,

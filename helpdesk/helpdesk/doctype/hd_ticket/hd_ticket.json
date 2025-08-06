@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "subject_section",
+  "ticket_billed",
   "subject",
   "raised_by",
   "status",
@@ -435,13 +436,19 @@
    "label": "Key",
    "read_only": 1,
    "set_only_once": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "ticket_billed",
+   "fieldtype": "Check",
+   "label": "Ticket Billed"
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-07-17 13:06:31.288737",
+ "modified": "2025-08-05 10:34:57.590351",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
