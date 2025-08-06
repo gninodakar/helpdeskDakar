@@ -5,13 +5,11 @@
 
 **Customer Service, Made Simple and Effective**
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
-[![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
+![GitHub release 1.12.0]
 
 </div>
 
 </div>
-
 
 <div align="center">
 	<img src="./.github/Hero2.png" alt="Hero Image" width="100%" />
@@ -24,11 +22,11 @@
 </div>
 
 ## Frappe Helpdesk
-Frappe Helpdesk is an 100% open-source Ticket Management tool which helps you  streamline your company's support, offers an easy setup, clean user interface, and automation tools to resolve customer queries efficiently.
 
-
+Frappe Helpdesk is an 100% open-source Ticket Management tool which helps you streamline your company's support, offers an easy setup, clean user interface, and automation tools to resolve customer queries efficiently.
 
 ### Motivation
+
 Managing issues from our customers was a big challenge for us. We were using the ERPNext support module which was not very good in UI and the UX was also not good. We wanted to have a tool that can be easily integrated with our existing system and can be customized as per our needs. So we decided to build Frappe Helpdesk.
 
 ### Key Features
@@ -55,7 +53,6 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 ![Agent List View](.github/AgentListView.png)
 
-
 <div align="center">
 	<sub>
 		Upload articles and let your customer solve their queries through the Knowledge Base.
@@ -70,21 +67,16 @@ Managing issues from our customers was a big challenge for us. We were using the
 	</sub>
 </div>
 
-
 ![Article Search](.github/Search2.png)
-
-
 
 </details>
 <br>
-
 
 ### Under the Hood
 
 - [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and Javascript.
 
-- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface. 
-
+- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface.
 
 ## Production Setup
 
@@ -126,6 +118,7 @@ python3 ./easy-install.py deploy \
 ```
 
 Replace the following parameters with your values:
+
 - `your_email.example.com`: Your email address
 - `subdomain.domain.tld`: Your domain name where Helpdesk will be hosted
 
@@ -153,6 +146,7 @@ You need Docker, docker-compose and git setup on your machine. Refer [Docker doc
     docker compose up -d
 
 **Step 3**: The site [http://helpdesk.localhost:8000/helpdesk](http://helpdesk.localhost:8000/helpdesk) should now be available. The default credentials are:
+
 - Username: Administrator
 - Password: admin
 
@@ -168,13 +162,13 @@ To setup the repository locally follow the steps mentioned below:
 1. Run `bench --site helpdesk.test install-app helpdesk`.
 1. Now open the URL `http://helpdesk.test:8000/helpdesk` in your browser, you should see the app running
 
-
 **For Frontend Development**
+
 1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
-    ```
-    yarn install
-    yarn dev or yarn dev --host helpdesk.test
-    ```
+   ```
+   yarn install
+   yarn dev or yarn dev --host helpdesk.test
+   ```
 1. Now, you can access the site on vite dev server at `http://helpdesk.test:8080`
 
 **Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
