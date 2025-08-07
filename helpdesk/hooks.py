@@ -7,6 +7,11 @@ app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
 
+
+doctype_js = {
+    "HD Ticket": "hd_ticket/hd_ticket_list.js"
+}
+
 add_to_apps_screen = [
     {
         "name": "helpdesk",

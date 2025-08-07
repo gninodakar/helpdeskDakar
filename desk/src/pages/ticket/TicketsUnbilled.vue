@@ -14,33 +14,33 @@
     <div class="p-4 border-b bg-gray-50">
       <div class="p-4 border-b bg-gray-50">
         <div class="flex flex-wrap gap-4 items-end">
+          <!-- From Date Filter -->
           <div class="flex flex-col">
-            <label class="text-sm text-gray-600">From Date</label>
-            <input
+            <label class="text-sm text-gray-600 mb-1">From Date</label>
+            <DatePicker
               v-model="filters.fromDate"
-              type="date"
-              class="border rounded px-2 py-1"
+              placeholder="Select from date"
+              class="w-48 border border-gray-300 rounded-md"
             />
           </div>
 
           <!-- To Date Filter -->
           <div class="flex flex-col">
-            <label class="text-sm text-gray-600">To Date</label>
-            <input
+            <label class="text-sm text-gray-600 mb-1">To Date</label>
+            <DatePicker
               v-model="filters.toDate"
-              type="date"
-              class="border rounded px-2 py-1"
+              placeholder="Select to date"
+              class="w-48 border border-gray-300 rounded-md"
             />
           </div>
 
           <!-- Customer Filter -->
           <div class="flex flex-col">
-            <label class="text-sm text-gray-600">Customer</label>
-            <input
+            <label class="text-sm text-gray-600 mb-1">Customer</label>
+            <Input
               v-model="filters.customer"
-              type="text"
               placeholder="Search customer"
-              class="border rounded px-2 py-1"
+              class="w-64"
             />
           </div>
 
@@ -221,7 +221,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, Ref } from "vue";
-import { FeatherIcon, toast } from "frappe-ui";
+import { FeatherIcon, toast, Input, DatePicker } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 
 // Define interfaces

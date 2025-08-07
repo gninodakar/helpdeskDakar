@@ -441,6 +441,7 @@
    "default": "0",
    "fieldname": "ticket_billed",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Ticket Billed"
   }
  ],
@@ -448,7 +449,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-08-05 10:34:57.590351",
+ "modified": "2025-08-07 14:06:40.387703",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

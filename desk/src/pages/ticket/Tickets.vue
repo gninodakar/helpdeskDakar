@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <ViewBreadcrumbs
-          label="Tickets"
+          label="Ticketss"
           :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
           :options="dropdownOptions"
           :dropdown-actions="viewActions"
@@ -22,6 +22,26 @@
         </RouterLink>
       </template>
     </LayoutHeader>
+
+    <!-- 🔍 Filtros personalizados -->
+    <div class="mb-4 flex gap-4 items-end px-4">
+      <!-- Filtro: Asignado a -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"> </label>
+        <Input
+          v-model="filterAssignedTo"
+          placeholder="Ingrese usuario (email)"
+          class="w-64"
+        />
+      </div>
+
+      <!-- Filtro: Fecha de creación -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"> </label>
+        <DateRangePicker v-model="filterDateRange" class="w-72" />
+      </div>
+    </div>
+
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
@@ -39,6 +59,7 @@
           })
       "
     />
+
     <ExportModal
       v-model="showExportModal"
       :rowCount="$refs.listViewRef?.list?.data?.total_count ?? 0"
@@ -46,6 +67,7 @@
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
     />
+
     <ViewModal
       v-if="viewDialog.show"
       v-model="viewDialog"
@@ -63,6 +85,7 @@ import {
   TicketIcon,
   UnpinIcon,
 } from "@/components/icons";
+
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
@@ -71,10 +94,18 @@ import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { View } from "@/types";
+import type { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
-import { computed, h, onMounted, reactive, ref } from "vue";
+import {
+  Input,
+  Badge,
+  FeatherIcon,
+  toast,
+  Tooltip,
+  usePageMeta,
+  DateRangePicker,
+} from "frappe-ui";
+import { computed, h, onMounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
@@ -110,8 +141,45 @@ const selectBannerActions = [
   },
 ];
 
-const options = {
+/////////////////////////////
+const filterAssignedTo = ref("");
+const filterDateRange = ref([]);
+
+watch([filterAssignedTo, filterDateRange], () => {
+  const filters = [];
+
+  if (filterAssignedTo.value) {
+    filters.push([
+      "_assign", // ← campo interno que contiene asignados
+      "like",
+      `%${filterAssignedTo.value.trim()}%`,
+    ]);
+  }
+
+  const [from, to] = filterDateRange.value ?? [];
+
+  if (from && to) {
+    filters.push([
+      "creation",
+      "between",
+      [dayjs(from).format("YYYY-MM-DD"), dayjs(to).format("YYYY-MM-DD")],
+    ]);
+  }
+
+  // ⚠️ Reemplaza todo el objeto options para que ListViewBuilder actualice
+  options.value = {
+    ...options.value, // mantiene columnas, rutas, etc.
+    filters, // actualiza los filtros
+  };
+
+  console.log("✅ Filtros aplicados:", filters);
+});
+
+//////////////////////////
+
+const options = ref({
   doctype: "HD Ticket",
+  filters: [],
   columnConfig: {
     status: {
       prefix: ({ row }) => {
@@ -151,7 +219,7 @@ const options = {
     prop: "ticketId",
   },
   hideColumnSetting: false,
-};
+});
 
 function handle_response_by_field(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
