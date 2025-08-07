@@ -35,7 +35,7 @@ const routes = [
   {
     path: "/tickets",
     name: "TicketsAgent",
-    component: () => import("@/pages/ticket/Tickets.vue"),
+    component: () => import("@/pages/ticket/Tickets_.vue"),
   },
   {
     path: "/unbilledtickets",
