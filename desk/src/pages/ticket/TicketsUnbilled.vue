@@ -23,7 +23,6 @@
               class="w-48 border border-gray-300 rounded-md"
             />
           </div>
-
           <!-- To Date Filter -->
           <div class="flex flex-col">
             <label class="text-sm text-gray-600 mb-1">To Date</label>
@@ -33,7 +32,6 @@
               class="w-48 border border-gray-300 rounded-md"
             />
           </div>
-
           <!-- Customer Filter -->
           <div class="flex flex-col">
             <label class="text-sm text-gray-600 mb-1">Customer</label>
@@ -50,6 +48,13 @@
             <Button @click="clearFilters" variant="outline"
               >Clear Filters</Button
             >
+          </div>
+
+          <!-- Right-aligned refresh button -->
+          <div class="ml-auto">
+            <Button variant="ghost" @click="refreshScreen">
+              <FeatherIcon name="refresh-ccw" class="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
@@ -270,6 +275,11 @@ const error = ref<string | null>(null);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const totalRecords = ref(0);
+
+//refresh screen
+function refreshScreen(): void {
+  fetchDataFromFrappe();
+}
 
 // Confirmation dialog
 const showConfirmDialog = ref(false);
