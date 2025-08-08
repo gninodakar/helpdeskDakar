@@ -1,14 +1,18 @@
 frappe.listview_settings["HD Ticket"] = {
+  refresh(listview) {
+    
+  },
   onload(listview) {
-    // Agregar campo al header de filtros (parte superior)
+    // Add field to filter header (top)
+    $(".layout-side-section").hide();
     listview.page.add_field({
-      label: "xxxxxxxxxxxxxx",
+      label: "Date Range",
       fieldtype: "DateRange",
       fieldname: "creation_range",
       change() {
-        const value = this.get_value(); // [desde, hasta]
+        const value = this.get_value(); // [from , to]
         if (value && value[0] && value[1]) {
-          // Eliminar filtro anterior si existe
+          // remove creation filter
           listview.filter_area.remove("creation");
 
           // Agregar filtro por rango

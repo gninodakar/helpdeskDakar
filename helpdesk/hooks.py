@@ -8,6 +8,11 @@ app_email = "hello@frappe.io"
 app_license = "AGPLv3"
 
 
+#add custom js for whole app
+app_include_js = [
+    "/assets/helpdesk/js/custom_list_settings.js"
+]
+
 doctype_js = {
     "HD Ticket": "hd_ticket/hd_ticket_list.js"
 }
@@ -76,6 +81,6 @@ ignore_links_on_delete = [
 ]
 
 # setup wizard
-# setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
+setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
 # setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
 setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
