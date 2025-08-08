@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"44JNnzPSji\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/helpdesk\\\">Visit Helpdesk</a></span>\",\"col\":12}},{\"id\":\"cLfFBDhpRG\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Q7s9ecoVg5\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Helpdesk Configuration<br></span>\",\"col\":12}},{\"id\":\"hIY8m5UzOr\",\"type\":\"card\",\"data\":{\"card_name\":\"Ticket Configuration\",\"col\":4}},{\"id\":\"ad_SP2_Kye\",\"type\":\"card\",\"data\":{\"card_name\":\"Agent Configuration\",\"col\":4}},{\"id\":\"iB3tRA_ryE\",\"type\":\"card\",\"data\":{\"card_name\":\"Helpdesk Reports\",\"col\":4}},{\"id\":\"UH3duFgsoD\",\"type\":\"card\",\"data\":{\"card_name\":\"Automation\",\"col\":4}},{\"id\":\"C3fHbfSUol\",\"type\":\"card\",\"data\":{\"card_name\":\"Channels\",\"col\":4}}]",
+ "content": "[{\"id\":\"44JNnzPSji\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/helpdesk\\\">Visit Helpdesk</a></span>\",\"col\":12}},{\"id\":\"cLfFBDhpRG\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"Q7s9ecoVg5\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Helpdesk Configuration<br></span>\",\"col\":12}},{\"id\":\"GGUu_MGkgP\",\"type\":\"card\",\"data\":{\"card_name\":\"Tickets View\",\"col\":4}},{\"id\":\"hIY8m5UzOr\",\"type\":\"card\",\"data\":{\"card_name\":\"Ticket Configuration\",\"col\":4}},{\"id\":\"ad_SP2_Kye\",\"type\":\"card\",\"data\":{\"card_name\":\"Agent Configuration\",\"col\":4}},{\"id\":\"iB3tRA_ryE\",\"type\":\"card\",\"data\":{\"card_name\":\"Helpdesk Reports\",\"col\":4}},{\"id\":\"UH3duFgsoD\",\"type\":\"card\",\"data\":{\"card_name\":\"Automation\",\"col\":4}},{\"id\":\"C3fHbfSUol\",\"type\":\"card\",\"data\":{\"card_name\":\"Channels\",\"col\":4}}]",
  "creation": "2022-09-17 11:48:26.825712",
  "custom_blocks": [],
  "docstatus": 0,
@@ -153,9 +153,28 @@
    "onboard": 0,
    "report_ref_doctype": "HD Ticket",
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Tickets View",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Ticket List",
+   "link_count": 0,
+   "link_to": "HD Ticket",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-07-17 12:23:17.496470",
+ "modified": "2025-08-08 12:11:10.762404",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "Helpdesk",

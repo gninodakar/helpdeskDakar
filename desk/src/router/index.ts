@@ -35,6 +35,11 @@ const routes = [
   {
     path: "/tickets",
     name: "TicketsAgent",
+    component: () => import("@/pages/ticket/Tickets.vue"),
+  },
+  {
+    path: "/ticketstemp",
+    name: "TicketsAgentTemp",
     component: () => import("@/pages/ticket/Tickets_.vue"),
   },
   {
@@ -49,6 +54,16 @@ const routes = [
       import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
     props: true,
   },
+  /////////////////
+  {
+    path: "/ticketstemp/:ticketId",
+    name: "TicketAgentTemp",
+    component: () =>
+      import(`@/pages/ticketstemp/${handleMobileView("TicketAgent")}.vue`),
+    props: true,
+  },
+
+  //////////////////
   {
     path: "/tickets/new/:templateId?",
     name: "TicketAgentNew",

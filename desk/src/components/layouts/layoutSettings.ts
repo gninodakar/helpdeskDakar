@@ -19,6 +19,11 @@ export const agentPortalSidebarOptions = [
     to: "TicketsAgent",
   },
   {
+    label: "Temp Model",
+    icon: LucideTicket,
+    to: "TicketsAgentTemp",
+  },
+  {
     label: "Unbilled Tickets",
     icon: Unbilled,
     to: "UnbilledTickets",

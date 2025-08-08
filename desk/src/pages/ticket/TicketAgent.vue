@@ -4,47 +4,29 @@
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
           <template #prefix="{ item }">
-            <Icon
-              v-if="item.icon"
-              :icon="item.icon"
-              class="mr-1 h-4 flex items-center justify-center self-center"
-            />
+            <Icon v-if="item.icon" :icon="item.icon" class="mr-1 h-4 flex items-center justify-center self-center" />
           </template>
         </Breadcrumbs>
       </template>
       <template #right-header>
-        <CustomActions
-          v-if="ticket.data._customActions"
-          :actions="ticket.data._customActions"
-        />
+        <CustomActions v-if="ticket.data._customActions" :actions="ticket.data._customActions" />
         <div v-if="ticket.data.assignees?.length">
           <component :is="ticket.data.assignees.length == 1 ? 'Button' : 'div'">
-            <MultipleAvatar
-              :avatars="ticket.data.assignees"
-              @click="showAssignmentModal = true"
-            />
+            <MultipleAvatar :avatars="ticket.data.assignees" @click="showAssignmentModal = true" />
           </component>
         </div>
-        <button
-          v-else
-          class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
-          @click="showAssignmentModal = true"
-        >
+        <button v-else class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
+          @click="showAssignmentModal = true">
           Assign
         </button>
         <Dropdown :options="dropdownOptions">
           <template #default="{ open }">
             <Button :label="ticket.data.status">
               <template #prefix>
-                <IndicatorIcon
-                  :class="ticketStatusStore.textColorMap[ticket.data.status]"
-                />
+                <IndicatorIcon :class="ticketStatusStore.textColorMap[ticket.data.status]" />
               </template>
               <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
-                  class="h-4"
-                />
+                <FeatherIcon :name="open ? 'chevron-up' : 'chevron-down'" class="h-4" />
               </template>
             </Button>
           </template>
@@ -57,86 +39,45 @@
           <Tabs v-model="tabIndex" :tabs="tabs">
             <TabList />
             <TabPanel v-slot="{ tab }" class="h-full">
-              <TicketAgentActivities
-                v-if="tab.name !== 'timeSheet'"
-                ref="ticketAgentActivitiesRef"
-                :activities="filterActivities(tab.name)"
-                :title="tab.label"
-                :ticket-status="ticket.data?.status"
+              <TicketAgentActivities v-if="tab.name !== 'timeSheet'" ref="ticketAgentActivitiesRef"
+                :activities="filterActivities(tab.name)" :title="tab.label" :ticket-status="ticket.data?.status"
                 @update="
                   () => {
                     ticket.reload();
                   }
-                "
-                @email:reply="
+                " @email:reply="
                   (e) => {
                     communicationAreaRef.replyToEmail(e);
                   }
-                "
-              />
-              <div
-                v-else-if="tab.name === 'timeSheet'"
-                class="p-4 h-full overflow-y-auto"
-              >
-                <TimeSheetForm
-                  :ticket-id="ticket.data.name"
-                  @row-added="ticket.reload()"
-                />
+                " />
+              <div v-else-if="tab.name === 'timeSheet'" class="p-4 h-full overflow-y-auto">
+                <TimeSheetForm :ticket-id="ticket.data.name" @row-added="ticket.reload()" />
               </div>
             </TabPanel>
           </Tabs>
         </div>
-        <CommunicationArea
-          v-if="tabs[tabIndex].name !== 'timeSheet'"
-          ref="communicationAreaRef"
-          v-model="ticket.data"
-          :to-emails="[ticket.data?.raised_by]"
-          :cc-emails="[]"
-          :bcc-emails="[]"
-          :key="ticket.data?.name"
-          @update="
+        <CommunicationArea v-if="tabs[tabIndex].name !== 'timeSheet'" ref="communicationAreaRef" v-model="ticket.data"
+          :to-emails="[ticket.data?.raised_by]" :cc-emails="[]" :bcc-emails="[]" :key="ticket.data?.name" @update="
             () => {
               ticket.reload();
               ticketAgentActivitiesRef.scrollToLatestActivity();
             }
-          "
-        />
+          " />
       </div>
-      <TicketAgentSidebar
-        :ticket="ticket.data"
-        @update="({ field, value }) => updateTicket(field, value)"
-        @email:open="(e) => communicationAreaRef.toggleEmailBox()"
-        @reload="ticket.reload()"
-      />
+      <TicketAgentSidebar :ticket="ticket.data" @update="({ field, value }) => updateTicket(field, value)"
+        @email:open="(e) => communicationAreaRef.toggleEmailBox()" @reload="ticket.reload()" />
     </div>
-    <AssignmentModal
-      v-if="ticket.data"
-      v-model="showAssignmentModal"
-      :assignees="ticket.data.assignees"
-      :docname="ticketId"
-      doctype="HD Ticket"
-      @update="
+    <AssignmentModal v-if="ticket.data" v-model="showAssignmentModal" :assignees="ticket.data.assignees"
+      :docname="ticketId" doctype="HD Ticket" @update="
         () => {
           ticket.reload();
         }
-      "
-    />
+      " />
     <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
       <template #body-content>
         <div class="flex flex-col flex-1 gap-3">
-          <FormControl
-            v-model="renameSubject"
-            type="textarea"
-            size="sm"
-            variant="subtle"
-            :disabled="false"
-          />
-          <Button
-            variant="solid"
-            :loading="isLoading"
-            label="Rename"
-            @click="handleRename"
-          />
+          <FormControl v-model="renameSubject" type="textarea" size="sm" variant="subtle" :disabled="false" />
+          <Button variant="solid" :loading="isLoading" label="Rename" @click="handleRename" />
         </div>
       </template>
     </Dialog>
@@ -247,31 +188,55 @@ const ticket = createResource({
     });
   },
 });
-function updateField(name: string, value: string, callback = () => {}) {
+function updateField(name: string, value: string, callback = () => { }) {
   updateTicket(name, value);
   callback();
 }
 
 const breadcrumbs = computed(() => {
-  let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
-  if (route.query.view) {
-    const currView: ComputedRef<View> = findView(route.query.view as string);
-    if (currView) {
-      items.push({
-        label: currView.value?.label,
-        icon: getIcon(currView.value?.icon),
-        route: { name: "TicketsAgent", query: { view: currView.value?.name } },
-      });
+  // Si vienes desde la lista temporal, estos query vienen seteados por el RouterLink de la tabla
+  const fromLabel = (route.query.fromLabel as string) || null
+  const fromRoute = (route.query.fromRoute as string) || null
+
+  // Si no viene info explícita, mantenemos el comportamiento anterior con el "view" normal
+  const items: any[] = []
+
+  if (fromLabel && fromRoute) {
+    // Caso: detalle abierto desde Tickets Temp View (o cualquier otra lista que lo pase)
+    items.push({
+      label: fromLabel,
+      route: { name: fromRoute }, // vuelve a la lista origen
+    })
+  } else {
+    // Fallback: comportamiento clásico
+    items.push({ label: "Tickets", route: { name: "TicketsAgent" } })
+
+    if (route.query.view) {
+      const currView: ComputedRef<View> = findView(route.query.view as string)
+      if (currView) {
+        items.push({
+          label: currView.value?.label,
+          icon: getIcon(currView.value?.icon),
+          route: {
+            name: "TicketsAgent",
+            query: { view: currView.value?.name },
+          },
+        })
+      }
     }
   }
+
+  // Siempre añadimos el ticket actual como último breadcrumb (no clicable)
   items.push({
     label: ticket.data?.subject,
     onClick: () => {
-      showSubjectDialog.value = true;
+      showSubjectDialog.value = true
     },
-  });
-  return items;
-});
+  })
+
+  return items
+})
+
 
 const handleRename = () => {
   if (renameSubject.value === ticket.data?.subject) return;
@@ -317,7 +282,6 @@ const tabs: TabObject[] = [
     label: "Comments",
     icon: CommentIcon,
   },
-
   {
     name: "timeSheet",
     label: "Time Sheet",
@@ -461,6 +425,7 @@ onUnmounted(() => {
 <style>
 .breadcrumbs button {
   background-color: inherit !important;
+
   &:hover,
   &:focus {
     background-color: inherit !important;
