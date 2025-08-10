@@ -579,9 +579,9 @@ class HDTicket(Document):
                 subject=subject,
                 template=template,
                 with_container=False,
-                in_reply_to=last_communication.name
-                if last_communication.name
-                else None,
+                in_reply_to=(
+                    last_communication.name if last_communication.name else None
+                ),
             )
         except Exception as e:
             frappe.throw(_(e))
@@ -813,10 +813,11 @@ class HDTicket(Document):
                 "width": "5rem",
             },
             {
-                "label": "Subject",
-                "type": "Data",
-                "key": "subject",
-                "width": "25rem",
+                "label": "Created",
+                "type": "Datetime",
+                "key": "creation",
+                "options": "Contact",
+                "width": "5rem",
             },
             {
                 "label": "Status",
@@ -825,22 +826,22 @@ class HDTicket(Document):
                 "width": "8rem",
             },
             {
-                "label": "First response",
-                "type": "Datetime",
-                "key": "response_by",
-                "width": "8rem",
-            },
-            {
-                "label": "Resolution",
-                "type": "Datetime",
-                "key": "resolution_by",
-                "width": "8rem",
+                "label": "Subject",
+                "type": "Data",
+                "key": "subject",
+                "width": "20rem",
             },
             {
                 "label": "Assigned To",
                 "type": "MultipleAvatar",
                 "key": "_assign",
                 "width": "8rem",
+            },
+            {
+                "label": "SLA Status",
+                "type": "Data",
+                "key": "agreement_status",
+                "width": "9rem",
             },
             {
                 "label": "Customer",
@@ -854,21 +855,7 @@ class HDTicket(Document):
                 "type": "Link",
                 "options": "HD Ticket Priority",
                 "key": "priority",
-                "width": "10rem",
-            },
-            {
-                "label": "Type",
-                "type": "Link",
-                "options": "HD Ticket Type",
-                "key": "ticket_type",
-                "width": "11rem",
-            },
-            {
-                "label": "Team",
-                "type": "Link",
-                "options": "HD Team",
-                "key": "agent_group",
-                "width": "10rem",
+                "width": "6rem",
             },
             {
                 "label": "Contact",
@@ -881,13 +868,20 @@ class HDTicket(Document):
                 "label": "Rating",
                 "type": "Rating",
                 "key": "feedback_rating",
+                "width": "5rem",
+            },
+            {
+                "label": "Type",
+                "type": "Link",
+                "options": "HD Ticket Type",
+                "key": "ticket_type",
                 "width": "10rem",
             },
             {
-                "label": "Created",
-                "type": "Datetime",
-                "key": "creation",
-                "options": "Contact",
+                "label": "Team",
+                "type": "Link",
+                "options": "HD Team",
+                "key": "agent_group",
                 "width": "8rem",
             },
         ]
@@ -902,7 +896,7 @@ class HDTicket(Document):
                 "label": "Subject",
                 "type": "Data",
                 "key": "subject",
-                "width": "22rem",
+                "width": "24rem",
             },
             {
                 "label": "Status",
@@ -946,26 +940,22 @@ class HDTicket(Document):
         ]
         rows = [
             "name",
+            "creation",
             "subject",
             "status",
+            "_assign",
+            "agreement_status",
+            "customer",
             "priority",
+            "contact",
+            "feedback_rating",
             "ticket_type",
             "agent_group",
-            "contact",
-            "agreement_status",
-            "response_by",
-            "resolution_by",
-            "customer",
-            "first_responded_on",
-            "modified",
-            "creation",
-            "_assign",
-            "resolution_date",
         ]
         return {
-            "columns": customer_portal_columns
-            if show_customer_portal_fields
-            else columns,
+            "columns": (
+                customer_portal_columns if show_customer_portal_fields else columns
+            ),
             "rows": rows,
         }
 
