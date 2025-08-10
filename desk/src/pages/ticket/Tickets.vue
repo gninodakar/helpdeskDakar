@@ -57,6 +57,7 @@ import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+
 const router = useRouter();
 const route = useRoute();
 
