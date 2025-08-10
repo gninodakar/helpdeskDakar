@@ -113,6 +113,7 @@ import {
   EmailIcon,
   IndicatorIcon,
 } from "@/components/icons";
+
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import TimeSheetForm from "@/components/ticket/TimeSheetForm.vue";
 import { setupCustomizations } from "@/composables/formCustomisation";
@@ -138,17 +139,19 @@ const renameSubject = ref("");
 const isLoading = ref(false);
 
 const props = defineProps({
-  ticketId: {
-    type: String,
-    required: true,
-  },
-});
+  ticketId: { type: String, required: true },
+  fromLabel: { type: String, default: 'Tickets' },
+  fromRoute: { type: String, default: 'TicketsAgent' },
+  fromPath: { type: String, default: null }, // ← nuevo
+})
+
 watch(
   () => props.ticketId,
   () => {
     ticket.reload();
   }
 );
+
 
 const { findView } = useView("HD Ticket");
 
@@ -193,45 +196,30 @@ function updateField(name: string, value: string, callback = () => { }) {
   callback();
 }
 
-const breadcrumbs = computed(() => {
-  // Si vienes desde la lista temporal, estos query vienen seteados por el RouterLink de la tabla
-  const fromLabel = (route.query.fromLabel as string) || null
-  const fromRoute = (route.query.fromRoute as string) || null
 
-  // Si no viene info explícita, mantenemos el comportamiento anterior con el "view" normal
+const breadcrumbs = computed(() => {
   const items: any[] = []
 
-  if (fromLabel && fromRoute) {
-    // Caso: detalle abierto desde Tickets Temp View (o cualquier otra lista que lo pase)
-    items.push({
-      label: fromLabel,
-      route: { name: fromRoute }, // vuelve a la lista origen
-    })
-  } else {
-    // Fallback: comportamiento clásico
-    items.push({ label: "Tickets", route: { name: "TicketsAgent" } })
-
-    if (route.query.view) {
-      const currView: ComputedRef<View> = findView(route.query.view as string)
-      if (currView) {
-        items.push({
-          label: currView.value?.label,
-          icon: getIcon(currView.value?.icon),
-          route: {
-            name: "TicketsAgent",
-            query: { view: currView.value?.name },
-          },
-        })
-      }
-    }
-  }
-
-  // Siempre añadimos el ticket actual como último breadcrumb (no clicable)
+  // Item padre: prioriza volver por path exacto (mantiene filtros)
   items.push({
-    label: ticket.data?.subject,
+    label: props.fromLabel,
+    // si tu <Breadcrumbs> soporta to/route, puedes añadirlo:
+    to: props.fromPath ?? { name: props.fromRoute },
+    // y garantizamos navegación aunque el componente no lo maneje:
     onClick: () => {
-      showSubjectDialog.value = true
+      if (props.fromPath) router.push(props.fromPath)
+      else router.push({ name: props.fromRoute })
     },
+  })
+
+  // Si usabas el fallback por view en query, puedes mantenerlo opcionalmente:
+  // (solo se ejecutaría si NO usas el bloque anterior)
+  // ...
+
+  // Último breadcrumb: ticket actual (no navegable)
+  items.push({
+    label: ticket.data?.subject || `Ticket ${props.ticketId}`,
+    onClick: () => { showSubjectDialog.value = true },
   })
 
   return items

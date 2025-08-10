@@ -47,23 +47,24 @@ const routes = [
     name: "UnbilledTickets",
     component: () => import("@/pages/ticket/TicketsUnbilled.vue"),
   },
-  {
-    path: "/tickets/:ticketId",
-    name: "TicketAgent",
-    component: () =>
-      import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
-    props: true,
-  },
-  /////////////////
-  {
-    path: "/ticketstemp/:ticketId",
-    name: "TicketAgentTemp",
-    component: () =>
-      import(`@/pages/ticketstemp/${handleMobileView("TicketAgent")}.vue`),
-    props: true,
-  },
-
-  //////////////////
+  // {
+  //   path: "/tickets/:ticketId",
+  //   name: "TicketAgent",
+  //   component: () =>
+  //     import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
+  //   props: true,
+  // },  
+{
+  path: "/tickets/:ticketId",
+  name: "TicketAgent",
+  component: () => import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
+  props: (route) => ({
+    ticketId: route.params.ticketId,
+    fromLabel: (route.query.fromLabel as string) ?? 'Tickets',
+    fromRoute: (route.query.fromRoute as string) ?? 'TicketsAgent',
+    fromPath: (route.query.fromPath as string) ?? null,
+  }),
+},
   {
     path: "/tickets/new/:templateId?",
     name: "TicketAgentNew",

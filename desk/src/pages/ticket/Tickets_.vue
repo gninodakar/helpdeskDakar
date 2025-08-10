@@ -81,9 +81,9 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm">
               <RouterLink :to="{
-                name: 'TicketAgentTemp',
+                name: 'TicketAgent',
                 params: { ticketId: row.name },
-                query: { fromLabel: 'Tickets Temp View', fromRoute: 'TicketsAgentTemp' }
+                query: { fromLabel: 'Tickets Temp View', fromRoute: 'TicketsAgentTemp', fromPath: route.fullPath, }
               }" class="text-blue-600 hover:underline font-medium">
                 {{ row.name }}
               </RouterLink>
@@ -176,6 +176,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, Ref } from "vue";
+import { useRoute } from 'vue-router'
 import { FeatherIcon, toast, Input, DatePicker } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 
@@ -233,6 +234,7 @@ const error = ref<string | null>(null);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const totalRecords = ref(0);
+const route = useRoute()
 
 //refresh screen
 function refreshScreen(): void {
