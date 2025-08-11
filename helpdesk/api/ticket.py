@@ -35,7 +35,8 @@ def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
 @frappe.whitelist()
 def get_unbilled_tickets():
     try:
-        get_unbilled_tickets = frappe.db.sql("""
+        get_unbilled_tickets = frappe.db.sql(
+            """
             SELECT 
                 ht.name,
                 ht.ticket_billed AS billed,
@@ -57,7 +58,9 @@ def get_unbilled_tickets():
                 ht.name, ht.customer, ht.creation, ht.first_response_time, ht.raised_by
             ORDER BY 
                 ht.creation DESC
-        """, as_dict=True)
+        """,
+            as_dict=True,
+        )
         return get_unbilled_tickets
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Failed to fetch unbilled tickets")
@@ -67,18 +70,20 @@ def get_unbilled_tickets():
 @frappe.whitelist()
 def update_ticket_billing_status(ticket_name, billed_status):
     try:
-        frappe.db.set_value("HD Ticket", ticket_name, "ticket_billed", int(billed_status))
+        frappe.db.set_value(
+            "HD Ticket", ticket_name, "ticket_billed", int(billed_status)
+        )
         return {"status": "success", "message": "Ticket updated successfully"}
     except Exception as e:
         frappe.log_error(f"Error updating ticket {ticket_name}: {str(e)}")
         frappe.throw(f"Failed to update ticket: {str(e)}")
 
 
-
 @frappe.whitelist()
-def get_tickets_list():
+def get_tickets_list(user=None, company=None):
     try:
-        get_unbilled_tickets = frappe.db.sql("""
+        get_unbilled_tickets = frappe.db.sql(
+            """
             SELECT
                 name, 
                 creation,
@@ -89,18 +94,22 @@ def get_tickets_list():
                 agreement_status AS sla_status,
                 customer,
                 priority,
-                contact,
-                feedback_rating AS rating,
+                contact,                
                 ticket_type,
-                raised_by
+                raised_by,
+                resolution_date AS resolution 
             FROM 
                 `tabHD Ticket` AS ht            
             WHERE 
                 ht.ticket_billed = 0                         
             ORDER BY 
                 ht.creation DESC
-        """, as_dict=True)
-        return get_unbilled_tickets
+        """,
+            as_dict=True,
+        )
+
+        return {"tickets": get_unbilled_tickets}
+
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Failed to fetch unbilled tickets")
         return []

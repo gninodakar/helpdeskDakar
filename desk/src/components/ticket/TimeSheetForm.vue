@@ -6,136 +6,70 @@
     <div class="flex flex-col sm:flex-row justify-start mb-4 gap-2">
       <button
         class="rounded bg-teal-500 px-3 py-1.5 text-base font-medium text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-        @click="sendmailpdf"
-        title="Email Ticket as PDF"
-      >
+        @click="sendmailpdf" title="Email Ticket as PDF">
         Email Time Sheet
       </button>
       <button
         class="rounded bg-amber-600 px-3 py-1.5 text-base font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
-        @click="downloadPdfDirect"
-        title="Download Report"
-      >
+        @click="downloadPdfDirect" title="Download Report">
         Download Time Sheet
       </button>
     </div>
-    <div class="flex justify-start mb-4"></div>
-    <form
-      @submit.prevent="addTimeSheetRow"
-      class="flex flex-wrap items-end gap-4 mb-8"
-    >
+    <form @submit.prevent="addTimeSheetRow" class="flex flex-wrap items-end gap-4 mb-8">
       <div class="flex-1 min-w-[150px]">
-        <label
-          for="eventType"
-          class="block text-sm font-medium text-gray-700 mb-1"
-          >Work Type</label
-        >
-        <select
-          id="eventType"
-          v-model="form.type_event"
+        <label for="eventType" class="block text-sm font-medium text-gray-700 mb-1">Work Type</label>
+        <select id="eventType" v-model="form.type_event"
           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          required
-        >
+          required>
           <option value="">Select event</option>
-          <option
-            v-for="event in eventTypes"
-            :key="event.value"
-            :value="event.value"
-          >
+          <option v-for="event in eventTypes" :key="event.value" :value="event.value">
             {{ event.event_name }}
           </option>
         </select>
       </div>
 
       <div class="flex-grow min-w-[100px]">
-        <label
-          for="duration"
-          class="block text-sm font-medium text-gray-700 mb-1"
-          >Duration (HH:mm)</label
-        >
+        <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration (HH:mm)</label>
         <div class="relative">
-          <input
-            type="text"
-            id="duration"
-            v-model="form.durationTime"
-            @input="formatTimeInput"
-            @blur="
-              () => {
-                if (form.durationTime && !validateTime(form.durationTime))
-                  toast.error('Invalid time: hours 0-99, minutes 0-59');
-              }
-            "
-            class="form-control block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="00:00"
-            maxlength="5"
-            required
-          />
-          <button
-            v-if="form.durationTime"
-            type="button"
-            @click="clearDuration"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none"
-          >
-            <svg
-              class="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+          <input type="text" id="duration" v-model="form.durationTime" @input="formatTimeInput" @blur="
+            () => {
+              if (form.durationTime && !validateTime(form.durationTime))
+                toast.error('Invalid time: hours 0-99, minutes 0-59');
+            }
+          " class="form-control block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            placeholder="00:00" maxlength="5" required />
+          <button v-if="form.durationTime" type="button" @click="clearDuration"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
 
       <div class="flex-grow min-w-[150px]">
-        <label for="date" class="block text-sm font-medium text-gray-700 mb-1"
-          >Date</label
-        >
-        <input
-          type="date"
-          id="date"
-          v-model="form.date"
+        <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+        <input type="date" id="date" v-model="form.date"
           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          required
-        />
+          required />
       </div>
 
       <div class="flex-auto min-w-[200px]">
-        <label
-          for="description"
-          class="block text-sm font-medium text-gray-700 mb-1"
-          >Description</label
-        >
-        <textarea
-          id="description"
-          v-model="form.hd_event_description"
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea id="description" v-model="form.hd_event_description"
           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          placeholder="Optional notes..."
-          rows="3"
-          required
-        ></textarea>
+          placeholder="Optional notes..." rows="3" required></textarea>
       </div>
       <div class="flex-shrink-0">
-        <button
-          type="submit"
-          :disabled="isLoading"
+        <button type="submit" :disabled="isLoading"
           class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
-        >
+          :class="{ 'opacity-50 cursor-not-allowed': isLoading }">
           {{ isLoading ? "Adding..." : "Add Entry" }}
         </button>
       </div>
     </form>
-    <div
-      v-if="timeSheetEntries.length"
-      class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-800 flex justify-between items-center"
-    >
+    <div v-if="timeSheetEntries.length"
+      class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-800 flex justify-between items-center">
       <span class="font-semibold">Total Time Expended:</span>
       <span class="text-xl font-bold">{{ totalDuration }} hours</span>
     </div>
@@ -148,40 +82,22 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 ID
               </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Agent
               </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Work Type
               </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 (hrs)
               </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
               </th>
               <th scope="col" class="relative px-6 py-3">
@@ -191,19 +107,13 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="entry in timeSheetEntries" :key="entry.name">
-              <td
-                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-              >
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ entry.id }}
               </td>
-              <td
-                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-              >
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ entry.agent }}
               </td>
-              <td
-                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-              >
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ entry.type_event }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -215,15 +125,10 @@
               <td class="px-6 py-4 text-sm text-gray-600 max-w-xs">
                 {{ entry.hd_event_description || "-" }}
               </td>
-              <td
-                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-              >
-                <button
-                  type="button"
-                  @click="deleteTimeSheetEntry(entry)"
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button type="button" @click="deleteTimeSheetEntry(entry)"
                   class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                  title="Delete Entry"
-                >
+                  title="Delete Entry">
                   <FeatherIcon name="trash-2" class="h-5 w-5" />
                   <span class="sr-only">Delete</span>
                 </button>
@@ -233,10 +138,7 @@
         </table>
       </div>
     </div>
-    <div
-      v-else
-      class="mt-8 p-4 text-center text-gray-500 border border-dashed rounded-md"
-    >
+    <div v-else class="mt-8 p-4 text-center text-gray-500 border border-dashed rounded-md">
       No time sheet entries added yet.
     </div>
   </div>
@@ -369,9 +271,8 @@ const downloadPdfDirect = async () => {
     // Create temporary link and trigger download
     const link = document.createElement("a");
     link.href = url;
-    link.download = `timesheet-report-${props.ticketId || "report"}-${
-      new Date().toISOString().split("T")[0]
-    }.pdf`;
+    link.download = `timesheet-report-${props.ticketId || "report"}-${new Date().toISOString().split("T")[0]
+      }.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -479,9 +380,9 @@ const fetchTimeSheet = createResource({
     );
     toast.error(
       "Failed to fetch time sheet entries: " +
-        (error.messages
-          ? error.messages.join(", ")
-          : error.message || "Unknown error")
+      (error.messages
+        ? error.messages.join(", ")
+        : error.message || "Unknown error")
     );
     timeSheetEntries.value = dummyTimeSheetEntries;
   },
@@ -580,10 +481,10 @@ const deleteTimeSheetEntry = async (entry: any) => {
   }
 };
 
-onMounted(() => {
-  fetchTimeSheet.reload();
-  eventTypesResource.reload(); // Trigger fetching event types on mount
-});
+// onMounted(() => {
+//   fetchTimeSheet.reload();
+//   eventTypesResource.reload(); // Trigger fetching event types on mount
+// });
 </script>
 
 <!-- ************************* 
