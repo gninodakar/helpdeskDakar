@@ -74,3 +74,33 @@ def update_ticket_billing_status(ticket_name, billed_status):
         frappe.throw(f"Failed to update ticket: {str(e)}")
 
 
+
+@frappe.whitelist()
+def get_tickets_list():
+    try:
+        get_unbilled_tickets = frappe.db.sql("""
+            SELECT
+                name, 
+                creation,
+                status,                
+                subject,
+                _assign AS assigned_to,
+                response_by,
+                agreement_status AS sla_status,
+                customer,
+                priority,
+                contact,
+                feedback_rating AS rating,
+                ticket_type,
+                raised_by
+            FROM 
+                `tabHD Ticket` AS ht            
+            WHERE 
+                ht.ticket_billed = 0                         
+            ORDER BY 
+                ht.creation DESC
+        """, as_dict=True)
+        return get_unbilled_tickets
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Failed to fetch unbilled tickets")
+        return []

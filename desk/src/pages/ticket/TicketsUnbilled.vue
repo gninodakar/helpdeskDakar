@@ -17,37 +17,25 @@
           <!-- From Date Filter -->
           <div class="flex flex-col">
             <label class="text-sm text-gray-600 mb-1">From Date</label>
-            <DatePicker
-              v-model="filters.fromDate"
-              placeholder="Select from date"
-              class="w-48 border border-gray-300 rounded-md"
-            />
+            <DatePicker v-model="filters.fromDate" placeholder="Select from date"
+              class="w-48 border border-gray-300 rounded-md" />
           </div>
           <!-- To Date Filter -->
           <div class="flex flex-col">
             <label class="text-sm text-gray-600 mb-1">To Date</label>
-            <DatePicker
-              v-model="filters.toDate"
-              placeholder="Select to date"
-              class="w-48 border border-gray-300 rounded-md"
-            />
+            <DatePicker v-model="filters.toDate" placeholder="Select to date"
+              class="w-48 border border-gray-300 rounded-md" />
           </div>
           <!-- Customer Filter -->
           <div class="flex flex-col">
             <label class="text-sm text-gray-600 mb-1">Customer</label>
-            <Input
-              v-model="filters.customer"
-              placeholder="Search customer"
-              class="w-64"
-            />
+            <Input v-model="filters.customer" placeholder="Search customer" class="w-64" />
           </div>
 
           <!-- Action Buttons -->
           <div class="flex items-end gap-2">
             <Button @click="applyFilters" variant="solid">Apply Filters</Button>
-            <Button @click="clearFilters" variant="outline"
-              >Clear Filters</Button
-            >
+            <Button @click="clearFilters" variant="outline">Clear Filters</Button>
           </div>
 
           <!-- Right-aligned refresh button -->
@@ -72,30 +60,18 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50 sticky top-0">
           <tr>
-            <th
-              v-for="column in columns"
-              :key="column.key"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th v-for="column in columns" :key="column.key"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               {{ column.label }}
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr
-            v-for="row in paginatedData"
-            :key="row.name"
-            class="hover:bg-gray-50"
-          >
+          <tr v-for="row in paginatedData" :key="row.name" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              <input
-                type="checkbox"
-                :checked="row.billed"
-                @change="
-                  handleBilledStatusChange(row.name, $event.target.checked)
-                "
-                class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
-              />
+              <input type="checkbox" :checked="row.billed" @change="
+                handleBilledStatusChange(row.name, $event.target.checked)
+                " class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500" />
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {{ row.name }}
@@ -119,18 +95,12 @@
         </tbody>
       </table>
       <!-- Empty State -->
-      <div
-        v-if="paginatedData.length === 0"
-        class="flex flex-col items-center justify-center p-12 text-gray-500"
-      >
+      <div v-if="paginatedData.length === 0" class="flex flex-col items-center justify-center p-12 text-gray-500">
         <p>No tickets found</p>
       </div>
     </div>
     <!-- Pagination Controls -->
-    <div
-      v-if="paginatedData.length > 0"
-      class="border-t px-4 py-3 flex items-center justify-between"
-    >
+    <div v-if="paginatedData.length > 0" class="border-t px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="text-sm text-gray-700">
           Showing {{ (currentPage - 1) * pageSize + 1 }} to
@@ -139,11 +109,7 @@
         </div>
         <div class="flex items-center gap-2">
           <label class="text-sm text-gray-700">Rows per page:</label>
-          <select
-            v-model="pageSize"
-            @change="handlePageSizeChange"
-            class="border rounded px-2 py-1 text-sm pr-8"
-          >
+          <select v-model="pageSize" @change="handlePageSizeChange" class="border rounded px-2 py-1 text-sm pr-8">
             <option :value="10">10</option>
             <option :value="20">20</option>
             <option :value="50">50</option>
@@ -155,45 +121,20 @@
           Page {{ currentPage }} of {{ totalPages }}
         </div>
         <div class="flex gap-1">
-          <Button
-            @click="goToFirstPage"
-            :disabled="currentPage === 1"
-            variant="outline"
-            size="sm"
-          >
+          <Button @click="goToFirstPage" :disabled="currentPage === 1" variant="outline" size="sm">
             <FeatherIcon name="chevrons-left" class="h-4 w-4" />
           </Button>
-          <Button
-            @click="goToPreviousPage"
-            :disabled="currentPage === 1"
-            variant="outline"
-            size="sm"
-          >
+          <Button @click="goToPreviousPage" :disabled="currentPage === 1" variant="outline" size="sm">
             <FeatherIcon name="chevron-left" class="h-4 w-4" />
           </Button>
-          <Button
-            v-for="page in visiblePages"
-            :key="page"
-            @click="currentPage = page"
-            :variant="currentPage === page ? 'solid' : 'outline'"
-            size="sm"
-          >
+          <Button v-for="page in visiblePages" :key="page" @click="currentPage = page"
+            :variant="currentPage === page ? 'solid' : 'outline'" size="sm">
             {{ page }}
           </Button>
-          <Button
-            @click="goToNextPage"
-            :disabled="currentPage === totalPages"
-            variant="outline"
-            size="sm"
-          >
+          <Button @click="goToNextPage" :disabled="currentPage === totalPages" variant="outline" size="sm">
             <FeatherIcon name="chevron-right" class="h-4 w-4" />
           </Button>
-          <Button
-            @click="goToLastPage"
-            :disabled="currentPage === totalPages"
-            variant="outline"
-            size="sm"
-          >
+          <Button @click="goToLastPage" :disabled="currentPage === totalPages" variant="outline" size="sm">
             <FeatherIcon name="chevrons-right" class="h-4 w-4" />
           </Button>
         </div>
@@ -201,10 +142,7 @@
     </div>
 
     <!-- Confirmation Dialog -->
-    <div
-      v-if="showConfirmDialog"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
+    <div v-if="showConfirmDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-96">
         <h3 class="text-lg font-medium mb-4">Confirm Billing Status Change</h3>
         <p class="mb-6">
@@ -212,8 +150,7 @@
           <strong>{{ confirmDialogData.ticketId }}</strong> as
           <strong>{{
             confirmDialogData.newStatus ? "billed" : "unbilled"
-          }}</strong
-          >?
+          }}</strong>?
         </p>
         <div class="flex justify-end gap-3">
           <Button @click="cancelStatusChange" variant="outline">Cancel</Button>
