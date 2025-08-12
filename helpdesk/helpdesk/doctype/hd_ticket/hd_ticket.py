@@ -129,6 +129,70 @@ class HDTicket(Document):
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
 
+        # ====== NEW BLOCK: Assign Customer by domain ======
+        try:
+            if not self.customer:
+                sender_email = None
+
+                # Priority: raised_by → email del Contact
+                if self.raised_by:
+                    sender_email = (self.raised_by or "").strip().lower()
+                    print(sender_email)
+                if not sender_email and self.contact:
+                    sender_email = frappe.db.get_value(
+                        "Contact Email", {"parent": self.contact}, "email_id"
+                    )
+
+                if sender_email and "@" in sender_email:
+                    domain = sender_email.split("@", 1)[1].lower()
+                    print(f"this is the domain: {domain}")
+                    public_domains = {
+                        # "gmail.com",
+                        "yahoo.com",
+                        # "outlook.com",
+                        # "hotmail.com",
+                        # "live.com",
+                        # "aol.com",
+                        # "icloud.com",
+                        # "proton.me",
+                        # "protonmail.com",
+                        # "gmx.com",
+                        # "yandex.com",
+                        # "zoho.com",
+                    }
+
+                    if domain not in public_domains:
+                        # Search Customer with custom field ‘domain’ equal to the domain
+                        customer = frappe.db.get_value(
+                            "HD Customer", {"domain": domain}, "name"
+                        )
+
+                        # Fallback: if there is no exact match, try base domain
+                        if not customer and domain.count(".") >= 2:
+                            base_domain = ".".join(domain.split(".")[-2:])
+                            if base_domain != domain:
+                                customer = frappe.db.get_value(
+                                    "HD Customer", {"domain": base_domain}, "name"
+                                )
+
+                        if customer:
+                            self.db_set("customer", customer, update_modified=True)
+
+                            # assign the default company if there are no considerations
+                            if hasattr(self, "company") and not self.company:
+                                company = frappe.db.get_value(
+                                    "Customer", customer, "default_company"
+                                )
+                                if company:
+                                    self.db_set(
+                                        "company", company, update_modified=True
+                                    )
+        except Exception:
+            frappe.log_error(
+                frappe.get_traceback(), "HD Ticket: auto-assign customer by domain"
+            )
+        # ====== END OF NEW BLOCK ======
+
         send_ack_email = frappe.db.get_single_value(
             "HD Settings", "send_acknowledgement_email"
         )
