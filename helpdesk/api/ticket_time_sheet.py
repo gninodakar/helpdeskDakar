@@ -145,10 +145,7 @@ def download_report_pdf(ticket_id=None):
 ##############################
 @frappe.whitelist(allow_guest=False) 
 def get_events(ticket_id=None):
-    # print(ticket_id)
-    """
-    ttt prefix = ticket time sheet
-    """
+    # print(ticket_id)  
     try:
         if not ticket_id:
             frappe.throw("Ticket ID is required to fetch time sheet events.")        

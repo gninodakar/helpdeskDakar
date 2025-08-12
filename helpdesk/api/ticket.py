@@ -83,33 +83,32 @@ def update_ticket_billing_status(ticket_name, billed_status):
 def get_tickets_list(user=None, company=None):
     try:
         get_unbilled_tickets = frappe.db.sql(
-            """
-            SELECT
-                name, 
-                creation,
-                status,                
-                subject,
-                _assign AS assigned_to,
-                response_by,
-                agreement_status AS sla_status,
-                customer,
-                priority,
-                contact,                
-                ticket_type,
-                raised_by,
-                resolution_date AS resolution 
-            FROM 
-                `tabHD Ticket` AS ht            
-            WHERE 
-                ht.ticket_billed = 0                         
-            ORDER BY 
-                ht.creation DESC
+        """
+        SELECT
+            ht.name,
+            ht.creation,
+            ht.status,
+            ht.subject,
+            COALESCE(u.full_name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))) AS assigned_to,
+            ht.response_by,
+            ht.agreement_status AS sla_status,
+            ht.customer,
+            ht.priority,
+            ht.contact,
+            ht.ticket_type,
+            ht.raised_by,
+            ht.resolution_date AS resolution
+        FROM `tabHD Ticket` ht
+        LEFT JOIN `tabUser` u
+            ON u.name = JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))
+        WHERE ht.ticket_billed = 0     
+        ORDER BY ht.creation DESC
         """,
             as_dict=True,
         )
 
         return {"tickets": get_unbilled_tickets}
-
+    
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Failed to fetch unbilled tickets")
         return []
