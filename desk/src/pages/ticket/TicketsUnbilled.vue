@@ -12,21 +12,21 @@
 
   <!-- filter -->
   <div class="p-2 ">
-    <div class="flex flex-wrap gap-4 items-end">
+    <div class="grid grid-cols-1 sm:grid-cols-[repeat(3,16rem)_auto_1fr] items-end gap-3 mb-4">
       <!-- From Date Filter -->
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-1">
         <label class="text-sm text-gray-600 mb-1">From Date</label>
         <DatePicker v-model="filters.fromDate" placeholder="Select from date"
           class="w-48 border border-gray-300 rounded-md" />
       </div>
       <!-- To Date Filter -->
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-1">
         <label class="text-sm text-gray-600 mb-1">To Date</label>
         <DatePicker v-model="filters.toDate" placeholder="Select to date"
           class="w-48 border border-gray-300 rounded-md" />
       </div>
       <!-- Customer Filter -->
-      <div class="flex flex-col">
+      <div class="flex flex-col gap-1">
         <label class="text-sm text-gray-600 mb-1">Customer</label>
         <Input v-model="filters.customer" placeholder="Search customer" class="w-64" />
       </div>
@@ -38,7 +38,7 @@
       </div>
 
       <!-- Right-aligned refresh button -->
-      <div class="ml-auto">
+      <div class="justify-self-end">
         <Button variant="ghost" @click="refreshScreen">
           <FeatherIcon name="refresh-ccw" class="h-5 w-5" />
         </Button>
@@ -102,9 +102,9 @@
           <div class="flex items-center gap-2">
             <label class="text-sm text-gray-700 ">Rows per page:</label>
             <select v-model="pageSize" @change="handlePageSizeChange" class="border rounded px-2 py-1 text-sm pr-8">
-              <option :value="10">10</option>
-              <option :value="20">20</option>
               <option :value="50">50</option>
+              <option :value="100">100</option>
+              <option :value="200">200</option>
             </select>
           </div>
         </div>
@@ -206,7 +206,7 @@ const data: Ref<Ticket[]> = ref([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const currentPage = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(50);
 const totalRecords = ref(0);
 
 //refresh screen

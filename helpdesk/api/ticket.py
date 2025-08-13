@@ -79,37 +79,60 @@ def update_ticket_billing_status(ticket_name, billed_status):
         frappe.throw(f"Failed to update ticket: {str(e)}")
 
 
-@frappe.whitelist()
-def get_tickets_list(user=None, company=None):
-    try:
-        get_unbilled_tickets = frappe.db.sql(
-        """
-        SELECT
-            ht.name,
-            ht.creation,
-            ht.status,
-            ht.subject,
-            COALESCE(u.full_name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))) AS assigned_to,
-            COALESCE(u.name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))) AS assigned_to_mail,
-            ht.response_by,
-            ht.agreement_status AS sla_status,
-            ht.customer,
-            ht.priority,
-            ht.contact,
-            ht.ticket_type,
-            ht.raised_by,
-            ht.resolution_date AS resolution
-        FROM `tabHD Ticket` ht
-        LEFT JOIN `tabUser` u
-            ON u.name = JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))
-        WHERE ht.ticket_billed = 0     
-        ORDER BY ht.creation DESC
-        """,
-            as_dict=True,
-        )
+import frappe
 
-        return {"tickets": get_unbilled_tickets}
-    
-    except Exception as e:
+@frappe.whitelist()
+def get_tickets_list(id=None,customer=None, agent=None, status=None):
+    try:
+        conditions = ["ht.ticket_billed = 0"]  # default basis
+        params = {}
+
+        if id:
+            conditions.append("ht.name LIKE %(id)s")
+            params["id"] = f"%{id}%"
+
+        if customer:
+            conditions.append("ht.customer LIKE %(customer)s")
+            params["customer"] = f"%{customer}%"
+
+        if agent:       
+             conditions.append("(u.full_name LIKE %(agent)s OR u.name LIKE %(agent)s)")
+             params["agent"] = f"%{agent}%"
+
+        if status:
+            conditions.append("ht.status LIKE %(status)s")
+            params["status"] = f"%{status}%"
+
+        where_clause = " AND ".join(conditions)
+
+        query = f"""
+            SELECT
+                ht.name,
+                ht.creation,
+                ht.status,
+                ht.subject,
+                COALESCE(u.full_name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))) AS assigned_to,
+                COALESCE(u.name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]')))     AS assigned_to_mail,
+                ht.response_by,
+                ht.agreement_status AS sla_status,
+                ht.customer,
+                ht.priority,
+                ht.contact,
+                ht.ticket_type,
+                ht.raised_by,
+                ht.resolution_date AS resolution
+            FROM `tabHD Ticket` ht
+            LEFT JOIN `tabUser` u
+                ON u.name = JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))
+            WHERE {where_clause}
+            ORDER BY ht.creation DESC
+        """
+
+        rows = frappe.db.sql(query, params, as_dict=True)
+        return {"tickets": rows}
+
+    except Exception:
         frappe.log_error(frappe.get_traceback(), "Failed to fetch unbilled tickets")
-        return []
+        return {"tickets": []}
+
+

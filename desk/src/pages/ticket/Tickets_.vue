@@ -18,21 +18,33 @@
   <div class="p-2 ">
     <!-- filter -->
     <div class="flex flex-col sm:flex-row justify-start mb-4 gap-2">
+      <!-- id -->
+      <div class="flex flex-col">
+        <label class="text-sm text-gray-600 mb-1">ID</label>
+        <Input v-model="filters.id" placeholder="Ticket ID" class="w-64" @keyup.enter="fetchTickets.reload()" />
+      </div>
       <!-- customer -->
       <div class="flex flex-col">
         <label class="text-sm text-gray-600 mb-1">Customer</label>
-        <Input v-model="value" placeholder="Custumer Name" class="w-64" />
+        <Input v-model="filters.customer" placeholder="Custumer Name" class="w-64"
+          @keyup.enter="fetchTickets.reload()" />
       </div>
       <!-- agent -->
       <div class="flex flex-col">
         <label class="text-sm text-gray-600 mb-1">Agent</label>
-        <Input v-model="value" placeholder="Agent Name" class="w-64" />
+        <Input v-model="filters.agent" placeholder="Agent Name" class="w-64" @keyup.enter="fetchTickets.reload()" />
       </div>
       <!-- status  -->
       <div class="flex flex-col">
         <label class="text-sm text-gray-600 mb-1">Status</label>
-        <Input v-model="value" placeholder="Status" class="w-64" />
+        <Input v-model="filters.status" placeholder="Status" class="w-64" @keyup.enter="fetchTickets.reload()" />
       </div>
+      <!-- Action Buttons -->
+      <div class="flex items-end gap-2">
+        <Button @click="fetchTickets.reload()" variant="solid">Apply Filters</Button>
+        <Button @click="clearFilters" variant="outline">Clear Filters</Button>
+      </div>
+
       <!-- Right-aligned refresh button -->
       <div class="ml-auto">
         <Button variant="ghost" @click="fetchTickets.reload()">
@@ -41,10 +53,12 @@
       </div>
     </div>
 
+
     <!-- table -->
     <div v-if="tickets.length" class="mt-8">
+      <p class="text-sm text-gray-700 mb-2">Total Tickets Found: {{ tickets.length }}</p>
       <div class="overflow-x-auto border border-gray-200 rounded-md">
-        <div class="max-h-[calc(100vh-160px)] overflow-y-auto">
+        <div class="max-h-[calc(100vh-170px)] overflow-y-auto">
           <table class="min-w-full table-auto divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -92,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h, reactive } from "vue";
+import { ref, computed, h, reactive, onMounted, onBeforeUnmount, type VNode } from "vue";
 import { useRouter, useRoute } from 'vue-router'
 import { toast, createResource, Input } from "frappe-ui";
 
@@ -121,6 +135,7 @@ interface Ticket {
   status: string;
   subject: string;
   assigned_to: string;
+  assigned_to_mail: string;
   sla_status: string;
   customer: string;
   priority: string;
@@ -151,9 +166,27 @@ interface TicketsResponse {
 
 //filters
 interface Filters {
-  fromDate: string;
-  toDate: string;
+  id: string;
   customer: string;
+  agent: string;
+  status: string;
+}
+
+const filters = reactive<Filters>({
+  id: "",
+  customer: "",
+  agent: "",
+  status: "",
+});
+
+// Clear filters
+function clearFilters(): void {
+  filters.id = "";
+  filters.customer = "";
+  filters.agent = "";
+  filters.status = "";
+  fetchTickets.reload()
+  toast.info("Filters cleared");
 }
 
 
@@ -197,7 +230,7 @@ const slaStatusColors: Record<string, { bg: string; border: string }> = {
   Failed: { bg: 'bg-red-100', border: 'border-red-600' }
 }
 
-// render de la columna **Status**
+// rendering of the column **Status**
 function renderStatusCell(row: Ticket) {
   const colors = statusColors[row.status] || { bg: 'bg-gray-100', border: 'border-gray-500' }
   return h('div', { class: ['flex items-center gap-2 px-2 py-1 rounded-full w-fit', colors.bg] }, [
@@ -206,7 +239,7 @@ function renderStatusCell(row: Ticket) {
   ])
 }
 
-// render de la columna **SLA Status**
+// rendering of the column **SLA Status**
 function renderSlaStatusCell(row: Ticket) {
   const colors = slaStatusColors[row.sla_status] || { bg: 'bg-gray-100', border: 'border-gray-500' }
   return h('div', { class: ['flex items-center gap-2 px-2 py-1 rounded-full w-fit', colors.bg] }, [
@@ -215,14 +248,81 @@ function renderSlaStatusCell(row: Ticket) {
   ])
 }
 
+//render tooltip to assigned to 
+function renderAssignedToCell(row: Ticket): VNode {
+  const showBox = ref(false);
+  const name = row.assigned_to ?? "";
+  const mail = row.assigned_to_mail ?? "";
 
+  // Cierra si se hace click fuera
+  const handleClickOutside = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest(`#agent-cell-${row.name}`)) {
+      showBox.value = false;
+    }
+  };
+
+  onMounted(() => {
+    document.addEventListener("click", handleClickOutside);
+  });
+
+  onBeforeUnmount(() => {
+    document.removeEventListener("click", handleClickOutside);
+  });
+
+  return h(
+    "div",
+    {
+      id: `agent-cell-${row.name}`,
+      class: "relative inline-flex items-center cursor-pointer",
+      onClick: () => {
+        showBox.value = !showBox.value;
+      },
+    },
+    [
+      // Texto visible
+      h("span", {
+        class: "truncate max-w-[180px]",
+        title: name,
+        innerHTML: name,
+      }),
+
+      // Caja condicional
+      showBox.value &&
+      h(
+        "div",
+        {
+          class:
+            "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 " +
+            "bg-white shadow-lg border border-gray-200 rounded-lg p-3 w-56 " +
+            "transition-opacity z-10 text-gray-800 space-y-2",
+        },
+        [
+          h("div", { class: "font-semibold text-sm" }, name),
+          h(
+            "a",
+            {
+              href: `mailto:${mail}`,
+              class: "text-xs text-blue-600 hover:underline break-all",
+            },
+            mail || ""
+          ),
+          // más elementos futuros aquí...
+        ]
+      ),
+    ]
+  );
+}
+
+
+//structure to render cells
 const ticketColumns: Column<Ticket>[] = [
   { label: "ID", key: "name", thClass: thclass, tdClass: tdClass },
   { label: "Created", key: "creation", thClass: thclass, tdClass: tdClass },
   { label: "Resolution", key: "resolution", thClass: thclass, tdClass: tdClass },
   { label: "Status", key: "status", thClass: thclass, tdClass: tdClass, cell: renderStatusCell },
   { label: "Subject", key: "subject", thClass: thclass, tdClass: tdClass + " truncate max-w-[200px]", tooltip: (row) => `Subject: ${row.subject}` },
-  { label: "Assigned To", key: "assigned_to", thClass: thclass, tdClass: tdClass },
+  { label: "Assigned To", key: "assigned_to", thClass: thclass, tdClass: tdClass, cell: renderAssignedToCell },
   { label: "SLA Status", key: "sla_status", thClass: thclass, tdClass: tdClass, cell: renderSlaStatusCell },
   { label: "Customer", key: "customer", thClass: thclass, tdClass: tdClass },
   { label: "Priority", key: "priority", thClass: thclass, tdClass: tdClass },
@@ -242,6 +342,7 @@ function mapToTicket(item: any): Ticket {
     status: item.status || "",
     subject: item.subject || "",
     assigned_to: item.assigned_to || "",
+    assigned_to_mail: item.assigned_to_mail || "",
     sla_status: item.sla_status || "",
     customer: item.customer || "",
     priority: item.priority || "",
@@ -259,10 +360,14 @@ const dummyTickets: Ticket[] = [];
 const fetchTickets = createResource({
   url: "helpdesk.api.ticket.get_tickets_list",
   auto: true,
-  makeParams: (): TicketsParams => ({
-    user: "",
-    company: "",
-  }),
+  makeParams: (): Partial<Filters> => {
+    const params: Partial<Filters> = {};
+    if (filters.id) params.id = filters.id;
+    if (filters.customer) params.customer = filters.customer;
+    if (filters.agent) params.agent = filters.agent;
+    if (filters.status) params.status = filters.status;
+    return params;
+  },
   onSuccess: (data: TicketsResponse) => {
     const items = Array.isArray(data?.tickets)
       ? data.tickets!
