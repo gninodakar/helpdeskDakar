@@ -10,8 +10,9 @@
     </template>
   </LayoutHeader>
 
-  <!-- filter -->
+  <!-- containder table and  -->
   <div class="p-2 ">
+    <!-- filters -->
     <div class="grid grid-cols-1 sm:grid-cols-[repeat(3,16rem)_auto_1fr] items-end gap-3 mb-4">
       <!-- From Date Filter -->
       <div class="flex flex-col gap-1">
@@ -32,18 +33,19 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-end gap-2">
+      <div class="flex items-end gap-2 mb-[0.3rem]">
         <Button @click="applyFilters" variant="solid">Apply Filters</Button>
         <Button @click="clearFilters" variant="outline">Clear Filters</Button>
       </div>
 
       <!-- Right-aligned refresh button -->
-      <div class="justify-self-end">
+      <div class="justify-self-end mb-[1.6rem]">
         <Button variant="ghost" @click="refreshScreen">
           <FeatherIcon name="refresh-ccw" class="h-5 w-5" />
         </Button>
       </div>
     </div>
+
     <!-- Data Table -->
     <div v-if="data.length" class="mt-8">
       <div class="overflow-x-auto border border-gray-200 rounded-md">

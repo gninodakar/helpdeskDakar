@@ -142,7 +142,7 @@ const props = defineProps({
   ticketId: { type: String, required: true },
   fromLabel: { type: String, default: 'Tickets' },
   fromRoute: { type: String, default: 'TicketsAgent' },
-  fromPath: { type: String, default: null }, // ← nuevo
+  fromPath: { type: String, default: null }, // ← new property
 })
 
 watch(

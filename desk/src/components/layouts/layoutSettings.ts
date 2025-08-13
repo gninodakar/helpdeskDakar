@@ -4,6 +4,7 @@ import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
 import TicketPercent from "~icons/lucide/ticket-percent";
 import Unbilled from "~icons/lucide/receipt-euro";
+import Remove from "~icons/lucide/ticket-x";
 
 import { OrganizationsIcon } from "../icons";
 
@@ -18,10 +19,13 @@ export const agentPortalSidebarOptions = [
     icon: LucideTicket,
     to: "TicketsAgent",
   },
+
+  //old list view
   {
-    label: "Temp Model",
-    icon: LucideTicket,
-    to: "TicketsAgentTemp",
+    label: "Old View Tickets",
+    // icon: LucideTicket,
+    icon: Remove,
+    to: "TicketsAgentOld",
   },
   {
     label: "Unbilled Tickets",

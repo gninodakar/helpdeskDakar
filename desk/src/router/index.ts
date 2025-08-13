@@ -32,15 +32,17 @@ const routes = [
     name: "TicketNewView",
     component: () => import("@/pages/ticket/TicketsNewView.vue"),
   },
+  //new list view
   {
     path: "/tickets",
     name: "TicketsAgent",
     component: () => import("@/pages/ticket/Tickets.vue"),
   },
+   //old view
   {
-    path: "/ticketstemp",
-    name: "TicketsAgentTemp",
-    component: () => import("@/pages/ticket/Tickets_.vue"),
+    path: "/ticketsold",
+    name: "TicketsAgentOld",
+    component: () => import("@/pages/ticket/TicketsOld.vue"),
   },
   {
     path: "/unbilledtickets",
@@ -137,7 +139,7 @@ const routes = [
   {
     path: "/my-tickets",
     name: "TicketsCustomer",
-    component: () => import("@/pages/ticket/Tickets.vue"),
+    component: () => import("@/pages/ticket/TicketsOld.vue"),
     meta: {
       public: true,
       auth: true,
