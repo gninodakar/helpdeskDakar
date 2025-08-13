@@ -128,13 +128,13 @@ class HDTicket(Document):
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
-
+       
         # ====== NEW BLOCK: Assign Customer by domain ======
         try:
             if not self.customer:
                 sender_email = None
 
-                # Priority: raised_by → email del Contact
+                # Priority: raised_by → email Contact
                 if self.raised_by:
                     sender_email = (self.raised_by or "").strip().lower()
                     print(sender_email)
@@ -146,19 +146,8 @@ class HDTicket(Document):
                 if sender_email and "@" in sender_email:
                     domain = sender_email.split("@", 1)[1].lower()
                     print(f"this is the domain: {domain}")
-                    public_domains = {
-                        # "gmail.com",
-                        "yahoo.com",
-                        # "outlook.com",
-                        # "hotmail.com",
-                        # "live.com",
-                        # "aol.com",
-                        # "icloud.com",
-                        # "proton.me",
-                        # "protonmail.com",
-                        # "gmx.com",
-                        # "yandex.com",
-                        # "zoho.com",
+                    public_domains = {                        
+                        "yahoo.com",                       
                     }
 
                     if domain not in public_domains:
@@ -191,6 +180,7 @@ class HDTicket(Document):
             frappe.log_error(
                 frappe.get_traceback(), "HD Ticket: auto-assign customer by domain"
             )
+                      
         # ====== END OF NEW BLOCK ======
 
         send_ack_email = frappe.db.get_single_value(
@@ -834,6 +824,8 @@ class HDTicket(Document):
         """
         if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
             sla.apply(self)
+    
+
 
     # `on_communication_update` is a special method exposed from `Communication` doctype.
     # It is called when a communication is updated. Beware of changes as this effectively
@@ -857,6 +849,31 @@ class HDTicket(Document):
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
+        
+        ###################
+        # custom block
+        ################
+        # If it is mail, take the account directly
+        if c.communication_medium == "Email" and c.sent_or_received == "Received":
+            account = getattr(c, "email_account", None)
+
+            #  (fallback simple) if it does not come, deduct it by the To:
+            if not account and c.recipients:
+                from email.utils import getaddresses
+                tos = [addr.strip().lower() for _, addr in getaddresses([c.recipients.replace(";", ",")])]
+                if tos:
+                    account = frappe.db.get_value("Email Account", {"email_id": ["in", tos]}, "name")
+
+            if account and not getattr(self, "email_account", None):
+                self.db_set("email_account", account, update_modified=True)
+                # optional: save the email address of the account
+                if frappe.db.has_column("HD Ticket", "email_account_address"):
+                    addr = frappe.db.get_value("Email Account", account, "email_id")
+                    if addr:
+                        self.db_set("email_account_address", addr, update_modified=True)
+            #######################
+            #  end custom block
+            ########################
         # Save the ticket, allowing for hooks to run.
         self.save()
 

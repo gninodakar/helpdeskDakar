@@ -90,6 +90,7 @@ def get_tickets_list(user=None, company=None):
             ht.status,
             ht.subject,
             COALESCE(u.full_name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))) AS assigned_to,
+            COALESCE(u.name, JSON_UNQUOTE(JSON_EXTRACT(ht._assign, '$[0]'))) AS assigned_to_mail,
             ht.response_by,
             ht.agreement_status AS sla_status,
             ht.customer,

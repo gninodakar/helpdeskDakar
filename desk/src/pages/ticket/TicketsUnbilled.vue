@@ -47,7 +47,7 @@
     <!-- Data Table -->
     <div v-if="data.length" class="mt-8">
       <div class="overflow-x-auto border border-gray-200 rounded-md">
-        <div class="max-h-[calc(100vh-160px)] overflow-y-auto">
+        <div class="max-h-[calc(100vh-225px)] overflow-y-auto">
           <table class="min-w-full table-auto divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
