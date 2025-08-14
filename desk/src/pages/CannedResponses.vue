@@ -5,18 +5,13 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <Button
-          label="Create"
-          theme="gray"
-          variant="solid"
-          @click="
-            () => {
-              title = null;
-              message = null;
-              showNewDialog = true;
-            }
-          "
-        >
+        <Button label="Create" theme="gray" variant="solid" @click="
+          () => {
+            title = null;
+            message = null;
+            showNewDialog = true;
+          }
+        ">
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
           </template>
@@ -24,44 +19,26 @@
       </template>
     </LayoutHeader>
     <div class="flex-1 overflow-y-auto">
-      <div
-        v-if="cannedResponses.data?.length > 0"
-        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4"
-      >
-        <div
-          v-for="cannedResponse in cannedResponses.data"
-          :key="cannedResponse.name"
+      <div v-if="cannedResponses.data?.length > 0" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        <div v-for="cannedResponse in cannedResponses.data" :key="cannedResponse.name"
           class="group flex h-60 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-4 py-3 pt-2 shadow-sm hover:bg-gray-50"
-          @click="editItem(cannedResponse)"
-        >
+          @click="editItem(cannedResponse)">
           <div class="flex items-center justify-between">
             <div class="truncate text-lg font-medium">
               {{ cannedResponse.title }}
             </div>
-            <Dropdown
-              :options="[
-                {
-                  label: 'Delete',
-                  icon: 'trash-2',
-                  onClick: () => deleteItem(cannedResponse.name),
-                },
-              ]"
-              @click.stop
-            >
-              <Button
-                icon="more-horizontal"
-                variant="ghosted"
-                class="hover:bg-white"
-              />
+            <Dropdown :options="[
+              {
+                label: 'Delete',
+                icon: 'trash-2',
+                onClick: () => deleteItem(cannedResponse.name),
+              },
+            ]" @click.stop>
+              <Button icon="more-horizontal" variant="ghosted" class="hover:bg-white" />
             </Dropdown>
           </div>
-          <TextEditor
-            v-if="cannedResponse.message"
-            :content="cannedResponse.message"
-            :editable="false"
-            editor-class="prose-sm"
-            class="flex-1 overflow-hidden response-preview"
-          />
+          <TextEditor v-if="cannedResponse.message" :content="cannedResponse.message" :editable="false"
+            editor-class="prose-sm" class="flex-1 overflow-hidden response-preview" />
           <div class="mt-2 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
               <UserAvatar :name="cannedResponse.owner" size="xs" />
@@ -69,9 +46,7 @@
                 {{ getUser(cannedResponse.owner).full_name }}
               </div>
             </div>
-            <Tooltip
-              :text="dateFormat(cannedResponse.modified, dateTooltipFormat)"
-            >
+            <Tooltip :text="dateFormat(cannedResponse.modified, dateTooltipFormat)">
               <div class="text-sm text-gray-700">
                 {{ dayjs.tz(cannedResponse.modified).fromNow() }}
               </div>
@@ -79,27 +54,17 @@
           </div>
         </div>
       </div>
-      <EmptyState
-        v-else
-        title="No Canned Responses Found"
-        @emptyStateAction="showNewDialog = true"
-      />
+      <EmptyState v-else title="No Message Templates Found" @emptyStateAction="showNewDialog = true" />
     </div>
-    <CannedResponseModal
-      v-model="showNewDialog"
-      v-model:title="title"
-      v-model:message="message"
-      :name="name"
-      :is-new="name ? false : true"
-      @close="
+    <CannedResponseModal v-model="showNewDialog" v-model:title="title" v-model:message="message" :name="name"
+      :is-new="name ? false : true" @close="
         () => {
           showNewDialog = false;
           title = null;
           message = null;
           name = null;
         }
-      "
-      @update="
+      " @update="
         () => {
           cannedResponses.reload();
           showNewDialog = false;
@@ -107,8 +72,7 @@
           message = null;
           name = null;
         }
-      "
-    />
+      " />
   </div>
 </template>
 <script setup lang="ts">
@@ -133,7 +97,7 @@ import EmptyState from "../components/EmptyState.vue";
 const { getUser } = useUserStore();
 
 const breadcrumbs = [
-  { label: "Canned Responses", route: { name: "CannedResponses" } },
+  { label: "Message Templates", route: { name: "CannedResponses" } },
 ];
 const route = useRoute();
 
@@ -167,7 +131,7 @@ async function deleteItem(name) {
 
 usePageMeta(() => {
   return {
-    title: "Canned Responses",
+    title: "Message Templates",
   };
 });
 </script>

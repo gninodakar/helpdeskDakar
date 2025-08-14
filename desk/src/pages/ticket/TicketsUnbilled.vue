@@ -49,22 +49,22 @@
     <!-- Data Table -->
     <div v-if="data.length" class="mt-8">
       <div class="overflow-x-auto border border-gray-200 rounded-md">
-        <div class="max-h-[calc(100vh-225px)] overflow-y-auto">
+        <div class="max-h-[calc(100vh-200px)] overflow-y-auto">
           <table class="min-w-full table-auto divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
                 <th v-for="column in columns" :key="column.key"
-                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 z-10 bg-gray-50">
+                  class="px-1 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 z-10 bg-gray-50">
                   {{ column.label }}
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="row in paginatedData" :key="row.name" class="hover:bg-gray-50">
+              <tr v-for="row in paginatedData" :key="row.name" class="hover:bg-gray-50 text-left">
                 <td class="px-4 py-2 text-center align-middle w-10">
-                  <input type="checkbox" :checked="row.billed" @change="
-                    handleBilledStatusChange(row.name, $event.target.checked)
-                    " class="h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
+                  <input type="checkbox" :checked="row.billed"
+                    @change="handleBilledStatusChange(row.name, $event.target.checked)"
+                    class="h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
                 </td>
                 <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-900">
                   {{ row.name }}
@@ -102,7 +102,7 @@
             {{ totalRecords }} results
           </div>
           <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-700 ">Rows per page:</label>
+            <label class="text-sm text-gray-700 w-32 text-right">Rows per page:</label>
             <select v-model="pageSize" @change="handlePageSizeChange" class="border rounded px-2 py-1 text-sm pr-8">
               <option :value="50">50</option>
               <option :value="100">100</option>
@@ -147,9 +147,7 @@
       <p class="mb-6">
         Are you sure you want to mark ticket
         <strong>{{ confirmDialogData.ticketId }}</strong> as
-        <strong>{{
-          confirmDialogData.newStatus ? "billed" : "unbilled"
-        }}</strong>?
+        <strong>{{ confirmDialogData.newStatus ? "billed" : "unbilled" }}</strong>?
       </p>
       <div class="flex justify-end gap-3">
         <Button @click="cancelStatusChange" variant="outline">Cancel</Button>
@@ -164,7 +162,9 @@ import { ref, computed, onMounted, watch, Ref } from "vue";
 import { FeatherIcon, toast, Input, DatePicker } from "frappe-ui";
 import { LayoutHeader } from "@/components";
 
+/**************** */
 // Define interfaces
+/*************** */
 interface Ticket {
   name: string;
   billed: boolean;
@@ -189,9 +189,12 @@ interface Filters {
 interface ConfirmDialogData {
   ticketId: string | null;
   newStatus: boolean | null;
+  prevStatus: boolean | null;
 }
 
-// Columns definition with type
+/**************** */
+// Data definition
+/*************** */
 const columns: Column[] = [
   { key: "billed", label: "Billed" },
   { key: "name", label: "ID" },
@@ -221,6 +224,7 @@ const showConfirmDialog = ref(false);
 const confirmDialogData: Ref<ConfirmDialogData> = ref({
   ticketId: null,
   newStatus: null,
+  prevStatus: null, // ✅ init
 });
 
 // Clear filters
@@ -257,8 +261,6 @@ async function fetchDataFromFrappe(): Promise<void> {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          // Add authentication headers if is necessary
-          // "Authorization": "token your_api_key:your_api_secret",
         },
       }
     );
@@ -279,44 +281,19 @@ async function fetchDataFromFrappe(): Promise<void> {
       originalData.value = frappeData;
       applyFilters();
     } else {
-      //dummy data for testing
+      // dummy option if needed
       // generateDummyData();
     }
   } catch (err: any) {
     error.value = err.message || "Failed to fetch data from Frappe";
     console.error("Frappe API Error:", err);
-    //test data
-    //generateDummyData();
+    // generateDummyData();
   } finally {
     loading.value = false;
   }
 }
 
-// Generate dummy data with types
-// function generateDummyData(): void {
-//   const dummyData: Ticket[] = [];
-//   for (let i = 1; i <= 2000; i++) {
-//     dummyData.push({
-//       name: `TKT-${String(i).padStart(4, "0")}`,
-//       billed: Math.random() > 0.7,
-//       creation: new Date(
-//         Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000
-//       )
-//         .toISOString()
-//         .split("T")[0],
-//       customer: `Customer ${String.fromCharCode(65 + (i % 26))}`,
-//       ticket_type: ["Bug", "Feature", "Support", "Maintenance"][
-//         Math.floor(Math.random() * 4)
-//       ],
-//       time_expended: (Math.random() * 10).toFixed(1),
-//       raised_by: `user${Math.floor(Math.random() * 10) + 1}@company.com`,
-//     });
-//   }
-//   originalData.value = dummyData;
-//   applyFilters();
-// }
-
-// Computed properties with types
+// Computed properties
 const totalPages = computed<number>(() => {
   return Math.ceil(totalRecords.value / pageSize.value);
 });
@@ -330,26 +307,21 @@ const paginatedData = computed<Ticket[]>(() => {
 const visiblePages = computed<number[]>(() => {
   const pages: number[] = [];
   const maxVisiblePages = 5;
-  let startPage = Math.max(
-    1,
-    currentPage.value - Math.floor(maxVisiblePages / 2)
-  );
+  let startPage = Math.max(1, currentPage.value - Math.floor(maxVisiblePages / 2));
   let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
   if (endPage - startPage + 1 < maxVisiblePages) {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
+  for (let i = startPage; i <= endPage; i++) pages.push(i);
   return pages;
 });
 
 // Watch pageSize changes
-watch(pageSize, (newPageSize: number) => {
+watch(pageSize, () => {
   currentPage.value = 1;
 });
 
-// Methods with types
+// Methods
 function handlePageSizeChange(): void {
   currentPage.value = 1;
 }
@@ -359,15 +331,11 @@ function goToFirstPage(): void {
 }
 
 function goToPreviousPage(): void {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
+  if (currentPage.value > 1) currentPage.value--;
 }
 
 function goToNextPage(): void {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-  }
+  if (currentPage.value < totalPages.value) currentPage.value++;
 }
 
 function goToLastPage(): void {
@@ -386,9 +354,7 @@ function applyFilters(): void {
     }
     if (filters.value.customer) {
       const searchTerm = filters.value.customer.toLowerCase();
-      result = result.filter((item) =>
-        item.customer.toLowerCase().includes(searchTerm)
-      );
+      result = result.filter((item) => item.customer.toLowerCase().includes(searchTerm));
     }
     data.value = result;
     totalRecords.value = result.length;
@@ -400,27 +366,40 @@ function applyFilters(): void {
   }
 }
 
-// Handle checkbox change with confirmation
+/* ========= Billing toggle with confirm ========= */
+
+// When changing checkbox: save previous state and update UI optimistically
 function handleBilledStatusChange(ticketId: string, newStatus: boolean): void {
-  // Show confirmation dialog
+  const row = data.value.find((t) => t.name === ticketId);
+  const prev = row ? !!row.billed : false;
+
+  if (row) row.billed = newStatus;
   confirmDialogData.value = {
     ticketId,
     newStatus,
+    prevStatus: prev,
   };
   showConfirmDialog.value = true;
 }
 
 async function cancelStatusChange(): Promise<void> {
   showConfirmDialog.value = false;
-  await fetchDataFromFrappe();
+
+  const { ticketId, prevStatus } = confirmDialogData.value;
+  if (ticketId != null && prevStatus != null) {
+    updateBilledStatus(ticketId, prevStatus);
+  }
+
+
+  confirmDialogData.value = { ticketId: null, newStatus: null, prevStatus: null };
+
+
 }
 
 async function confirmStatusChange(): Promise<void> {
-  const { ticketId, newStatus } = confirmDialogData.value;
+  const { ticketId, newStatus, prevStatus } = confirmDialogData.value;
 
-  if (ticketId === null || newStatus === null) {
-    return;
-  }
+  if (ticketId === null || newStatus === null) return;
 
   showConfirmDialog.value = false;
 
@@ -431,7 +410,7 @@ async function confirmStatusChange(): Promise<void> {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Frappe-CSRF-Token": window.csrf_token || "",
+          "X-Frappe-CSRF-Token": (window as any).csrf_token || "",
         },
         body: JSON.stringify({
           ticket_name: ticketId,
@@ -447,16 +426,18 @@ async function confirmStatusChange(): Promise<void> {
     }
 
     updateBilledStatus(ticketId, newStatus);
-    toast.success(
-      `Ticket ${ticketId} marked as ${newStatus ? "billed" : "unbilled"}`
-    );
+    toast.success(`Ticket ${ticketId} marked as ${newStatus ? "billed" : "unbilled"}`);
+
+    // refresh
     await fetchDataFromFrappe();
   } catch (err: any) {
     console.error("Error updating ticket:", err);
-    toast.error(
-      `Failed to update ticket ${ticketId}: ${err.message || "Unknown error"}`
-    );
-    updateBilledStatus(ticketId, !newStatus);
+    toast.error(`Failed to update ticket ${ticketId}: ${err.message || "Unknown error"}`);
+
+    // Revert to previous value if the backend fails
+    if (prevStatus != null) updateBilledStatus(ticketId, prevStatus);
+  } finally {
+    confirmDialogData.value = { ticketId: null, newStatus: null, prevStatus: null };
   }
 }
 
@@ -466,22 +447,16 @@ function updateBilledStatus(ticketId: string, isBilled: boolean): void {
     ticket.billed = isBilled;
   }
 
-  const originalTicket = originalData.value.find(
-    (item) => item.name === ticketId
-  );
+  const originalTicket = originalData.value.find((item) => item.name === ticketId);
   if (originalTicket) {
     originalTicket.billed = isBilled;
   }
 }
 
+///////////////////////////////
 function saveChanges(): void {
-  console.log(
-    "Saving changes:",
-    data.value.filter((item) => item.billed)
-  );
-  alert(
-    `Saved ${data.value.filter((item) => item.billed).length} billed tickets`
-  );
+  console.log("Saving changes:", data.value.filter((item) => item.billed));
+  alert(`Saved ${data.value.filter((item) => item.billed).length} billed tickets`);
 }
 
 function formatDate(dateString: string): string {
@@ -489,10 +464,6 @@ function formatDate(dateString: string): string {
 }
 </script>
 
-
-<!-- ************************* 
- styles 
-<!-- ************************ -->
 <style scoped>
 /* Basic styling for the form elements */
 label {
@@ -527,18 +498,12 @@ table {
   border-collapse: collapse;
 }
 
-/* th,td {
-  padding: 0.5rem 1.5rem;
-  text-align: left;
-}  */
-
 thead th {
   background-color: #f3f3f3;
   border-bottom-width: 1px;
   border-color: #e5e7eb;
   color: #272727;
   text-transform: uppercase;
-
 }
 
 tbody td {

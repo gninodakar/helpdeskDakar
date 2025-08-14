@@ -30,7 +30,7 @@ export const agentPortalSidebarOptions = [
     to: "AgentKnowledgeBase",
   },
   {
-    label: "Canned responses",
+    label: "Message Templates",
     icon: LucideCloudLightning,
     to: "CannedResponses",
   },
