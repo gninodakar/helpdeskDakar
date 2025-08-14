@@ -3,11 +3,12 @@
 
   <LayoutHeader>
     <template #left-header>
-      <ViewBreadcrumbs label="Tickets" :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
+      <ViewBreadcrumbs label="Tickets" :route-name="isCustomerList ? 'TicketsCustomer' : 'TicketsAgent'"
         :options="dropdownOptions" :dropdown-actions="viewActions" :current-view="currentView" />
     </template>
+
     <template #right-header>
-      <RouterLink :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }">
+      <RouterLink :to="{ name: isCustomerList ? 'TicketNew' : 'TicketAgentNew' }">
         <Button label="Create" theme="gray" variant="solid">
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
@@ -125,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h, reactive, type VNode } from "vue";
+import { ref, computed, h, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { toast, createResource, Input } from "frappe-ui";
 

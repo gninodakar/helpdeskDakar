@@ -19,14 +19,6 @@ export const agentPortalSidebarOptions = [
     icon: LucideTicket,
     to: "TicketsAgent",
   },
-
-  //old list view
-  {
-    label: "Old View Tickets",
-    // icon: LucideTicket,
-    icon: Remove,
-    to: "TicketsAgentOld",
-  },
   {
     label: "Unbilled Tickets",
     icon: Unbilled,
@@ -51,6 +43,14 @@ export const agentPortalSidebarOptions = [
     label: "Contacts",
     icon: LucideContact2,
     to: "ContactList",
+  },
+
+  //old list view
+  {
+    label: "Old View Tickets",
+    // icon: LucideTicket,
+    icon: Remove,
+    to: "TicketsAgentOld",
   },
 ];
 

@@ -321,7 +321,7 @@ const activities = computed(() => {
   );
 
   const sorted = [...emailProps, ...commentProps, ...historyProps].sort(
-    (a, b) => new Date(a.creation) - new Date(b.creation)
+    (a, b) => new Date(a.creation).getTime() - new Date(b.creation).getTime()
   );
 
   const data = [];
