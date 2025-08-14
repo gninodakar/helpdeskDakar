@@ -38,7 +38,7 @@ const routes = [
     name: "TicketsAgent",
     component: () => import("@/pages/ticket/Tickets.vue"),
   },
-   //old view
+  //old view
   {
     path: "/ticketsold",
     name: "TicketsAgentOld",
@@ -56,17 +56,17 @@ const routes = [
   //     import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
   //   props: true,
   // },  
-{
-  path: "/tickets/:ticketId",
-  name: "TicketAgent",
-  component: () => import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
-  props: (route) => ({
-    ticketId: route.params.ticketId,
-    fromLabel: (route.query.fromLabel as string) ?? 'Tickets',
-    fromRoute: (route.query.fromRoute as string) ?? 'TicketsAgent',
-    fromPath: (route.query.fromPath as string) ?? null,
-  }),
-},
+  {
+    path: "/tickets/:ticketId",
+    name: "TicketAgent",
+    component: () => import(`@/pages/ticket/${handleMobileView("TicketAgent")}.vue`),
+    props: (route) => ({
+      ticketId: route.params.ticketId,
+      fromLabel: (route.query.fromLabel as string) ?? 'Tickets',
+      fromRoute: (route.query.fromRoute as string) ?? 'TicketsAgent',
+      fromPath: (route.query.fromPath as string) ?? null,
+    }),
+  },
   {
     path: "/tickets/new/:templateId?",
     name: "TicketAgentNew",
@@ -135,11 +135,13 @@ const routes = [
     component: () => import("@/pages/dashboard/Dashboard.vue"),
   },
 
+  /* ****************************
   // Customer Portal Routes
+  /* **************************** */
   {
     path: "/my-tickets",
     name: "TicketsCustomer",
-    component: () => import("@/pages/ticket/TicketsOld.vue"),
+    component: () => import("@/pages/ticket/Tickets.vue"),
     meta: {
       public: true,
       auth: true,

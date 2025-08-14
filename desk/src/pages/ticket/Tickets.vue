@@ -17,6 +17,7 @@
     </template>
   </LayoutHeader>
 
+
   <!-- table and filters -->
   <div class="p-2">
     <!-- filter -->
@@ -132,16 +133,24 @@ import { toast, createResource, Input } from "frappe-ui";
 const router = useRouter();
 const route = useRoute();
 
+const isCustomerList = computed(() =>
+  (typeof route.name === 'string' && route.name === 'TicketsCustomer') ||
+  !!route.meta.public
+)
+
 function goToTicket(ticket: { name: string }) {
+  const detailRoute = isCustomerList.value ? 'TicketCustomer' : 'TicketAgent'
+  const listRoute = isCustomerList.value ? 'TicketsCustomer' : 'TicketsAgent'
+
   router.push({
-    name: "TicketAgent",
+    name: detailRoute,
     params: { ticketId: ticket.name },
     query: {
-      fromLabel: "Tickets",
-      fromRoute: "TicketsAgentTemp",
+      fromLabel: 'Tickets',
+      fromRoute: listRoute,
       fromPath: route.fullPath,
     },
-  });
+  })
 }
 
 /* ========= Interfaces ========= */
