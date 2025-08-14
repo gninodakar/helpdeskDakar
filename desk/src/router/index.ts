@@ -30,7 +30,7 @@ const routes = [
   {
     path: "/ticketsnewview",
     name: "TicketNewView",
-    component: () => import("@/pages/ticket/TicketsNewView.vue"),
+    component: () => import("@/pages/ticket/TicketsSummary.vue"),
   },
   //new list view
   {
